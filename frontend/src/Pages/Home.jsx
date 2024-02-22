@@ -11,7 +11,6 @@ function Home() {
 
     return (
         <div className="flex flex-column home">
-            <Header />
             <div className="d-flex button-box m-auto">
                 <a href="/signin" className="btn btn-light">Sign In</a>
                 <a href="#" onClick={handleContactUsClick} className="btn btn-light">Contact Us</a>
