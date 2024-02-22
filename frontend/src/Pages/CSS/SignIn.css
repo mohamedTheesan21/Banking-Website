@@ -1,80 +1,5 @@
-/* .signin{
-    margin: auto;
-    width: 100%;
-    padding-top: 0;
-    height: 89vh;
-    background: linear-gradient();
-}
-
-.user-details{
-    width: 80%;
-    margin: auto;
-    padding-top: 100px;
-    margin-bottom: 20px;
-}
-
-.box{
-    padding-top: 20px;
-    background-color: rgba(168, 168, 168, 0.5);
-    text-align: center;
-    border-radius: 10px;
-}
-
-.user-details input{
-    width: 80%;
-    padding: 10px;
-    margin: auto;
-    margin-top: 10px;
-}
-
-.forgot-password{
-    width: 80%;
-    margin: auto;
-    margin-bottom: 20px;
-}
-
-.forgot-password a{
-    color: rgb(97, 2, 160);
-}
-
-.user-details button{
-    width: 80%;
-    margin: auto;
-    margin-bottom: 20px;
-    background-color: rgb(97, 2, 160);
-}
-
-.user-details button:hover{
-    background-color: rgb(75, 2, 123);
-}
-
-.new-user-register{
-    width: 64%;
-    margin: auto;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    background-color: rgb(255, 255, 255);
-    text-align: center;
-}
-
-.new-user-register p{
-    color: white;
-    background-color: rgb(97, 2, 160);
-}
-
-.new-user-register a{
-    color: rgb(97, 2, 160);
-    
-}
-
- */
-
-.signin{
-    height: 89vh;
-}
-
 .signin-right{
-    height: 89vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -113,7 +38,7 @@
 
 
 .signin-left{
-    height: 89vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -129,9 +54,17 @@
 .signin-left input{
     width: 350px;
     border-radius: 30px;
-    background-color: rgb(171, 189, 255);
+    background-color: rgb(213, 222, 254);
     margin: auto;
     margin-top: 10px;
+}
+
+.eye-icon{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
 }
 
 .signin-left button{
