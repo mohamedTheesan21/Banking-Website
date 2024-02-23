@@ -11,10 +11,10 @@
     margin-top: 10px;
 }
 
-.home{
+.background{
     height: 100vh;
 
-    background-image: url("../../../public/Images/home.jpg");
+    background-image: url("../../../public/Images/background2.jpg");
     background-size: cover;
     /* Ensures the image covers the entire background */
     background-repeat: no-repeat;
