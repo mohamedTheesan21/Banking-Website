@@ -4,12 +4,34 @@ const dbConnect = require("./dbConnect");
 const path = require("path");
 const cors = require("cors");
 const User = require("./models/User");
-const { generateVerificationCodeAndSave, verifyUser } = require("./verification");
+const userSchema = require("./models/User").schema;
+const Auth = require("./models/Auth");
+const authSchema = require("./models/Auth").schema;
+const {
+  generateVerificationCodeAndSave,
+  verifyUser,
+} = require("./verification");
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
+const session = require("express-session");
+const findOrCreate = require("mongoose-findorcreate");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // to parse json data
 app.use(cors());
+
+// Set up express-session
+app.use(
+  session({
+    secret: "My_name_is_Mohamed_Theesan",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // const newUser = new User({
 //   name: "Mohamed Theesan",
@@ -32,22 +54,20 @@ app.use(cors());
 // Serve static files from the React build directory
 app.use(express.static(path.join(__dirname, "build")));
 
-// Serve React app for any route except "/register" (assuming "/register" is your backend route)
-// app.get(/^\/(?!register).*/, (req, res) => {
-//   res.sendFile(path.join(__dirname, "../frontend/public/", "index.html"));
-// });
-
-
 app.post("/register", async (req, res) => {
   const formData = req.body;
   try {
-    const existingUser = await User.findOne({email: formData.email, phoneNo: formData.phoneNumber, accountID: formData.accountNumber});
+    const existingUser = await User.findOne({
+      email: formData.email,
+      phoneNo: formData.phoneNumber,
+      accountID: formData.accountNumber,
+    });
     if (existingUser) {
-        generateVerificationCodeAndSave(formData.email);
-        res.status(200).send("Verification code sent");
+      generateVerificationCodeAndSave(formData.email);
+      res.status(200).send("Verification code sent");
     } else {
       res.status(404).send("User does not exist");
-        console.log("User does not exist");
+      console.log("User does not exist");
     }
   } catch (error) {
     console.error("Error querying MongoDB:", error);
@@ -57,13 +77,33 @@ app.post("/register", async (req, res) => {
 
 app.post("/verify", async (req, res) => {
   const formData = req.body;
-  if(verifyUser(formData.email, formData.verificationCode)){
+  if (verifyUser(formData.email, formData.verificationCode)) {
     res.status(200).send("User verified");
-  }
-  else{
+  } else {
     res.status(404).send("User not verified");
   }
-})
+});
+
+app.post("/signup", async (req, res) => {
+  console.log("Signup request received");
+  const formData = req.body;
+  const existingUser = await User.findOne({ email: formData.email });
+  if (existingUser) {
+    try {
+      const newUser = new Auth({ username: formData.username });
+      // Set the password using setPassword method provided by passport-local-mongoose
+      await newUser.setPassword(formData.password);
+      // Save the new user
+      await newUser.save();
+      await existingUser.updateOne({ auth: newUser });
+      console.log("User registered");
+      res.status(200).send("User registered");
+    } catch (error) {
+      console.error("Error registering user:", error);
+      res.status(500).send("Error registering user");
+    }
+  }
+});
 
 app.listen(3001, () => {
   console.log("server is running port 3001");

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const authSchema = require("./Auth").schema;
 
 const userSchema = new mongoose.Schema({
   name: String,
@@ -6,6 +7,7 @@ const userSchema = new mongoose.Schema({
   phoneNo: String,
   accountID: String,
   balance: Number,
+  auth: authSchema
 });
 
 

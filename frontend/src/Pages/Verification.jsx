@@ -68,7 +68,7 @@ function Verification() {
       });
 
       if (response.status === 200) {
-        navigate("/account");
+        navigate("/signup");
       }
 
       if (response.status === 404) {
