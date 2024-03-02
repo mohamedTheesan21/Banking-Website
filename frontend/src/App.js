@@ -4,6 +4,7 @@ import Home from "./Pages/Home";
 import SignIn from "./Pages/SignIn";
 import Register from "./Pages/Register";
 import Account from "./Pages/Account";
+import Verification from './Pages/Verification';
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/register" element={<Register />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/verification" element={<Verification />} />
       </Routes>
     </BrowserRouter>
       
