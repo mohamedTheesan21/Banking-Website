@@ -22,7 +22,7 @@ function SignIn() {
           <div style={{ position: "relative" }}>
             <input
               type={showPassword ? "text" : "password"}
-              class="form-control"
+              className="form-control"
               placeholder="Password"
             />
             {!showPassword ? (
@@ -32,7 +32,7 @@ function SignIn() {
               ></i>
             ) : (
               <i
-                class="fa-regular fa-eye-slash eye-icon"
+                className="fa-regular fa-eye-slash eye-icon"
                 onClick={togglePasswordVisibility}
               ></i>
             )}
