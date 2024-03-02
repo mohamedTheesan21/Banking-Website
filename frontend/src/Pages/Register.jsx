@@ -38,6 +38,11 @@ function Register() {
           console.log("User does not exist");
           setError ("User does not match with our records. Please try again. if you don't have an account, please go to the nearest branch to open an account. Thank you.");
         }
+
+        if(response.status === 400) {
+          console.log("User already registered");
+          setError ("User already registered");
+        }
     
         if (!response.ok) {
           throw new Error('Failed to submit form');
@@ -54,7 +59,7 @@ function Register() {
     <div className="background d-flex flex-column justify-content-center align-items-center ">
       
       <form onSubmit={handleSubmit} action="post" className="form-elements">
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error text-center ">{error}</p>}
         <input
           type="text"
           value={accountNumber}

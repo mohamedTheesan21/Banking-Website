@@ -15,11 +15,13 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const session = require("express-session");
 const findOrCreate = require("mongoose-findorcreate");
+// const cookieParser = require("cookie-parser")
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // to parse json data
 app.use(cors());
+// app.use(cookieParser());
 
 // Set up express-session
 app.use(
@@ -62,10 +64,12 @@ app.post("/register", async (req, res) => {
       phoneNo: formData.phoneNumber,
       accountID: formData.accountNumber,
     });
-    if (existingUser) {
+    if (existingUser && existingUser.auth === null) {
       generateVerificationCodeAndSave(formData.email);
       res.status(200).send("Verification code sent");
-    } else {
+    } else if(existingUser.auth !== null) {
+      res.status(400).send("User already registered");
+    }else{
       res.status(404).send("User does not exist");
       console.log("User does not exist");
     }
@@ -104,6 +108,25 @@ app.post("/signup", async (req, res) => {
     }
   }
 });
+
+app.post("/signin", async (req, res) => {
+  const newAuth = new Auth({
+    username: req.body.username,
+    password: req.body.password,
+  });
+  req.login(newAuth, (err) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error logging in");
+    } else {
+      passport.authenticate("local")(req, res, () => {
+        console.log("User logged in");
+        res.status(200).send("User logged in");
+      });
+    }
+  });
+  
+})
 
 app.listen(3001, () => {
   console.log("server is running port 3001");

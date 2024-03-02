@@ -73,7 +73,7 @@ const saveVerificationCodeToDatabase = async (
   newVerification
     .save()
     .then((savedVerification) => {
-      console.log("Verification saved successfully:", savedVerification);
+      console.log("Verification saved successfully:");
     })
     .catch((error) => {
       console.error("Error saving verification:", error);
