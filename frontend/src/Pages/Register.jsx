@@ -1,11 +1,17 @@
 import React, { useState } from "react";
+import {useNavigate} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Register.css";
+import { useEmail } from "../Contexts/EmailContext";
 
 function Register() {
   const [accountNumber, setAccountNumber] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
+  const { setEmailForContext} = useEmail();
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +29,15 @@ function Register() {
           },
           body: JSON.stringify(formData)
         });
+
+        if(response.status === 200) {
+          navigate("/verification");
+        }
+
+        if(response.status === 404) {
+          console.log("User does not exist");
+          setError ("User does not match with our records. Please try again. if you don't have an account, please go to the nearest branch to open an account. Thank you.");
+        }
     
         if (!response.ok) {
           throw new Error('Failed to submit form');
@@ -30,14 +45,16 @@ function Register() {
     
         // Handle success response
         console.log('Form data submitted successfully');
-      } catch (error) {
-        console.error('Error submitting form:', error.message);
+      } catch (err) {
+        console.error('Error submitting form:', err.message);
       }
     };
 
   return (
     <div className="background d-flex flex-column justify-content-center align-items-center ">
+      
       <form onSubmit={handleSubmit} action="post" className="form-elements">
+      {error && <p className="error">{error}</p>}
         <input
           type="text"
           value={accountNumber}
@@ -57,7 +74,7 @@ function Register() {
         <input
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {setEmail(e.target.value); setEmailForContext(e.target.value)}}
           className="form-control"
           placeholder="Enter Email Address"
           required
