@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Verification.css";
 import { useEmail } from "../Contexts/EmailContext";
+import { useAuth } from "../Contexts/Auth";
 
 function Verification() {
   const { email } = useEmail();
+  const { verified } = useAuth();
+
   const [verificationCode, setVerificationCode] = useState([
     "",
     "",
@@ -59,7 +62,7 @@ function Verification() {
     };
 
     try {
-      const response = await fetch("http://localhost:3001/verify", {
+      const response = await fetch("http://localhost:3001/user/verify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,6 +71,7 @@ function Verification() {
       });
 
       if (response.status === 200) {
+        verified();
         navigate("/signup");
       }
 
@@ -84,7 +88,7 @@ function Verification() {
     } catch (err) {
       console.error("Error submitting form:", err.message);
     }
-  }
+  };
 
   return (
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
@@ -118,7 +122,11 @@ function Verification() {
         >
           Time remaining: {formatTime(remainingTime)}{" "}
         </p>
-        <form onSubmit={handleSubmit} action="post" className="form-elements d-flex justify-content-center m-0">
+        <form
+          onSubmit={handleSubmit}
+          action="post"
+          className="form-elements d-flex justify-content-center m-0"
+        >
           {verificationCode.join("").length === 6 && (
             <button type="submit" className="btn btn-primary m-0 ">
               Verify
