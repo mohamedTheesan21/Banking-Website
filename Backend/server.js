@@ -4,17 +4,12 @@ const dbConnect = require("./dbConnect");
 const path = require("path");
 const cors = require("cors");
 const User = require("./models/User");
-const userSchema = require("./models/User").schema;
 const Auth = require("./models/Auth");
-const authSchema = require("./models/Auth").schema;
-const {
-  generateVerificationCodeAndSave,
-  verifyUser,
-} = require("./verification");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const session = require("express-session");
-const findOrCreate = require("mongoose-findorcreate");
+const userRouter = require("./Routers/UserRouter");
+const jwt = require("jsonwebtoken");
 // const cookieParser = require("cookie-parser")
 
 const app = express();
@@ -34,6 +29,17 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Session Serialization and Deserialization
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
 
 // const newUser = new User({
 //   name: "Mohamed Theesan",
@@ -56,77 +62,36 @@ app.use(passport.session());
 // Serve static files from the React build directory
 app.use(express.static(path.join(__dirname, "build")));
 
-app.post("/register", async (req, res) => {
-  const formData = req.body;
+app.use("/user", userRouter);
+
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).json({ message: "Token not provided" });
+  }
+
   try {
-    const existingUser = await User.findOne({
-      email: formData.email,
-      phoneNo: formData.phoneNumber,
-      accountID: formData.accountNumber,
-    });
-    if (existingUser && existingUser.auth === null) {
-      generateVerificationCodeAndSave(formData.email);
-      res.status(200).send("Verification code sent");
-    } else if(existingUser.auth !== null) {
-      res.status(400).send("User already registered");
-    }else{
-      res.status(404).send("User does not exist");
-      console.log("User does not exist");
-    }
+    const decoded = jwt.verify(token.split(" ")[1], "your_secret_key");
+    req.user = decoded;
+    next();
   } catch (error) {
-    console.error("Error querying MongoDB:", error);
-    res.status(500).send("Error querying MongoDB");
+    return res.status(403).json({ message: "Invalid token",  });
   }
-});
+};
 
-app.post("/verify", async (req, res) => {
-  const formData = req.body;
-  if (verifyUser(formData.email, formData.verificationCode)) {
-    res.status(200).send("User verified");
+// Route to handle GET /account
+app.get("/account", verifyToken, async (req, res) => {
+  // This endpoint is protected and requires a valid JWT token
+  const user = await User.findOne({ "auth.username": req.user.username });
+  if (user) {
+    res.status(200).json({ message: "User found", user });
   } else {
-    res.status(404).send("User not verified");
+    res.status(404).json({ message: "User not found" });
   }
 });
 
-app.post("/signup", async (req, res) => {
-  console.log("Signup request received");
-  const formData = req.body;
-  const existingUser = await User.findOne({ email: formData.email });
-  if (existingUser) {
-    try {
-      const newUser = new Auth({ username: formData.username });
-      // Set the password using setPassword method provided by passport-local-mongoose
-      await newUser.setPassword(formData.password);
-      // Save the new user
-      await newUser.save();
-      await existingUser.updateOne({ auth: newUser });
-      console.log("User registered");
-      res.status(200).send("User registered");
-    } catch (error) {
-      console.error("Error registering user:", error);
-      res.status(500).send("Error registering user");
-    }
-  }
-});
-
-app.post("/signin", async (req, res) => {
-  const newAuth = new Auth({
-    username: req.body.username,
-    password: req.body.password,
-  });
-  req.login(newAuth, (err) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send("Error logging in");
-    } else {
-      passport.authenticate("local")(req, res, () => {
-        console.log("User logged in");
-        res.status(200).send("User logged in");
-      });
-    }
-  });
-  
-})
 
 app.listen(3001, () => {
   console.log("server is running port 3001");

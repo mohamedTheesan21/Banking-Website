@@ -15,7 +15,7 @@ const generateVerificationCode =  (length) => {
 // Generate verification code and store it with timestamp
 const generateVerificationCodeAndSave = async (email) => {
   const verificationCode = generateVerificationCode(6);
-    sendVerificationEmail(email, verificationCode);
+    // sendVerificationEmail(email, verificationCode);
   const timestamp = Date.now(); // Current timestamp
   // Save the verification code and timestamp to the database
   await saveVerificationCodeToDatabase(email, verificationCode, timestamp);

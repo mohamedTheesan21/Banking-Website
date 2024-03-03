@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEmail } from "../Contexts/EmailContext";
+import { useAuth } from "../Contexts/Auth";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/SignUp.css";
 
@@ -10,6 +11,7 @@ function SignUp() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { email } = useEmail();
+  const  {isAuthenticated, login} = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +31,7 @@ function SignUp() {
       };
 
       try {
-        const response = await fetch("http://localhost:3001/signup", {
+        const response = await fetch("http://localhost:3001/user/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -37,7 +39,7 @@ function SignUp() {
           body: JSON.stringify(formData),
         });
         if (response.status === 200) {
-          navigate("/account");
+          login();
         }
         if (!response.ok) {
           throw new Error("Failed to submit form");
@@ -48,6 +50,13 @@ function SignUp() {
       }
     }
   };
+
+  useEffect(() => {
+    console.log("isAuthenticated:", isAuthenticated);
+    if (isAuthenticated) {
+      navigate("/account");
+    }
+  }, [isAuthenticated, navigate]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
