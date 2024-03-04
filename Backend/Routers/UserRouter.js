@@ -59,7 +59,6 @@ router.post("/register", async (req, res) => {
 
 // Verify user with verification code
 router.post("/verify", verifyToken, async (req, res) => {
-  console.log("req.user", req.user)
   if (!req.user) {
     res.status(403).json({ message: "Invalid token" });
   } else {
@@ -118,18 +117,35 @@ router.post("/signin", async (req, res) => {
   req.login(newAuth, (err) => {
     if (err) {
       console.log(err);
-      res.status(500).send("Error logging in");
+      return res.status(500).json({ message: "Error during login" });
     } else {
-      passport.authenticate("local")(req, res, () => {
-        const token = jwt.sign(
-          { username: req.body.username },
-          process.env.KEY,
-          {
-            expiresIn: "1h",
+      passport.authenticate("local", async (err, user) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({ message: "Error during authentication" });
+        }
+
+        if (!user) {
+          // Invalid username or password
+          return res.status(401).json({ message: "Invalid username or password" });
+        }
+
+        req.login(user, { session: false }, async (err) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({ message: "Error during login" });
           }
-        );
-        res.status(200).json({ token });
-      });
+
+          const token = jwt.sign(
+            { username: req.body.username },
+            process.env.KEY,
+            {
+              expiresIn: "1h",
+            }
+          );
+          return res.status(200).json({ token });
+        });
+      })(req, res);
     }
   });
 });

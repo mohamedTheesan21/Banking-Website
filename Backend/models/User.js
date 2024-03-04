@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   phoneNo: String,
   accountID: String,
   balance: Number,
+  branch: String,
   auth: authSchema
 });
 

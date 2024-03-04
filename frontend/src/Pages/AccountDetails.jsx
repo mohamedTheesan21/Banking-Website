@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { checkToken } from "../Tokens/CheckToken";
+import React, {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
+import {checkToken} from "../Tokens/CheckToken";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./CSS/Account.css";
 
-function Account() {
+function AccountDetails() {
   const [user, setUser] = useState(null);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,17 +32,8 @@ function Account() {
     } else {
       navigate("/signin");
     }
-  }, [navigate]);
-
-  const handleClick = () => {
-    // Remove the token from local storage
-    localStorage.removeItem("token");
-
-    // Redirect the user to the sign-in page
-    navigate("/signin");
-  };
-
-  // Check if user is null
+  },[navigate]);
+  console.log(user);
   if (!user) {
     return (
       <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
@@ -52,32 +41,17 @@ function Account() {
       </div>
     );
   }
-
-  const balance = user.balance || 0;
-
   return (
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-      <h1 className="text-white shadow-lg ">Hello, {user.name}</h1>
-      <div className="row m-0 box">
-        <div className="col-md-6 col-sm-12 mx-auto center">
-          <h2 className="text-black">Account Balance:LKR {balance}</h2>
-        </div>
-        <div className="col-md-6 col-sm-12 mx-auto center account-links">
-          <a href="/account/details" className="btn btn-primary">
-            Account Details
-          </a>
-          <a href="/tranfer" className="btn btn-primary ">
-            Transfers
-          </a>
-        </div>
-      </div>
-      <div>
-        <button className="btn btn-danger mt-5" onClick={handleClick}>
-          Logout
-        </button>
+      <div className="box">
+        <h2 className="text-white">Account Details</h2>
+        <h4>Account No: {user.accountID}</h4>
+        <h4>Branch: {user.branch}</h4>
+        <h4>Account Holder Name: {user.name}</h4>
+        <h4>Total Avilable Balance: LKR {user.balance}</h4>
       </div>
     </div>
   );
 }
 
-export default Account;
+export default AccountDetails;

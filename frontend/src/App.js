@@ -6,11 +6,11 @@ import Register from "./Pages/Register";
 import Account from "./Pages/Account";
 import Verification from "./Pages/Verification";
 import SignUp from "./Pages/SignUp";
+import AccountDetails from "./Pages/AccountDetails";
 
 function App() {
   return (
     <BrowserRouter>
-      {/* <Header /> */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signin" element={<SignIn />} />
@@ -18,6 +18,7 @@ function App() {
         <Route path="/account" element={<Account />} />
         <Route path="/verification" element={<Verification />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/account/details" element={<AccountDetails />} />
       </Routes>
     </BrowserRouter>
   );

@@ -5,7 +5,6 @@ const dbConnect = require("./dbConnect");
 const path = require("path");
 const cors = require("cors");
 const User = require("./models/User");
-const Auth = require("./models/Auth");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const session = require("express-session");
@@ -84,8 +83,16 @@ const verifyToken = (req, res, next) => {
 // Route to handle GET /account
 app.get("/account", verifyToken, async (req, res) => {
   // This endpoint is protected and requires a valid JWT token
-  const user = await User.findOne({ "auth.username": req.user.username });
-  if (user) {
+  const newUser = await User.findOne({ "auth.username": req.user.username });
+  if (newUser) {
+    const user = {
+      name: newUser.name,
+      email: newUser.email,
+      phoneNo: newUser.phoneNo,
+      accountID: newUser.accountID,
+      balance: newUser.balance,
+      branch: newUser.branch,
+    };
     res.status(200).json({ message: "User found", user });
   } else {
     res.status(404).json({ message: "User not found" });
