@@ -60,7 +60,7 @@ function Register() {
   return (
     <div className="background d-flex flex-column justify-content-center align-items-center ">
       <form onSubmit={handleSubmit} action="post" className="form-elements">
-        {error && <p className="error text-center ">{error}</p>}
+        {error && <p className="alert alert-danger">{error}</p>}
         <input
           type="text"
           value={accountNumber}

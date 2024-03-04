@@ -62,6 +62,13 @@ function Verification() {
     }
   },[navigate])
 
+  useEffect(() => {
+    const emailVerified = localStorage.getItem("emailVerified");
+    if (emailVerified){
+      navigate("/signup");
+    }
+  })
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -80,6 +87,8 @@ function Verification() {
       });
 
       if (response.status === 200) {
+        // set the emailVerified to true
+        localStorage.setItem("emailVerified", true);
         navigate("/signup");
       }
 

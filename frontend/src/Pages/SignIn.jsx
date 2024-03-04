@@ -7,6 +7,7 @@ function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -36,6 +37,14 @@ function SignIn() {
         localStorage.setItem("token", data.token);
         navigate("/account");
       }
+      else if (response.status === 401) {
+        const data = await response.json();
+        setMessage(data.message);
+      }
+      else if (response.status === 500) {
+        const data = await response.json();
+        setMessage(data.message);
+      }
       if (!response.ok) {
         throw new Error("Failed to submit form");
       }
@@ -49,6 +58,7 @@ function SignIn() {
     <div className="row signin m-0">
       <div className="col-md-8 col-sm-12 mx-auto signin-left p-0">
         <h1>Sign In</h1>
+        {message && <div className="alert alert-danger">{message}</div>}
         <form onSubmit={handleSubmit}>
           <input
             type="text"

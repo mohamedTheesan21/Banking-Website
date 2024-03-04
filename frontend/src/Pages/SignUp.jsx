@@ -39,16 +39,15 @@ function SignUp() {
           const data = await response.json(); // Parse response body as JSON
           console.log("Sign in successful", data.token);
           localStorage.setItem("token", data.token);
+          localStorage.removeItem("registerToken");
           navigate("/account");
-        }
-        else if (response.status === 400) {
+        } else if (response.status === 400) {
           const data = await response.json();
           setError(data.message);
+        } else if (response.status === 403) {
+          alert("session expired");
+          navigate("/register");
         }
-      else if (response.status === 403) {
-        alert("session expired");
-        navigate("/register");
-      }
         if (!response.ok) {
           throw new Error("Failed to submit form");
         }
@@ -59,7 +58,12 @@ function SignUp() {
     }
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const token = localStorage.getItem("registerToken");
+    if (!token) {
+      navigate("/register");
+    }
+  }, [navigate]);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -119,7 +123,7 @@ function SignUp() {
               ></i>
             )}
           </div>
-          {{ error } && <p className="error-text text-danger">{error}</p>}
+          {error && <p className="error-text text-danger">{error}</p>}
           <button type="submit" className="btn btn-primary">
             Sign up
           </button>
