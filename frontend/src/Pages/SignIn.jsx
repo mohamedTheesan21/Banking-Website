@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../Contexts/Auth";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/SignIn.css";
 
@@ -9,8 +8,6 @@ function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const  {isAuthenticated, login} = useAuth();
-
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -18,7 +15,6 @@ function SignIn() {
   };
 
   const handleSubmit = async (e) => {
-    
     e.preventDefault();
     const formData = {
       username: username,
@@ -36,10 +32,9 @@ function SignIn() {
 
       if (response.status === 200) {
         const data = await response.json(); // Parse response body as JSON
-      console.log("Sign in successful", data.token);
-      localStorage.setItem("token", data.token);
-      login();
-      navigate("/account");
+        console.log("Sign in successful", data.token);
+        localStorage.setItem("token", data.token);
+        navigate("/account");
       }
       if (!response.ok) {
         throw new Error("Failed to submit form");
@@ -48,14 +43,7 @@ function SignIn() {
     } catch (err) {
       console.error("Error submitting form:", err.message);
     }
-  }
-
-  // useEffect(() => {
-  //   console.log("isAuthenticated:", isAuthenticated);
-  //   if (isAuthenticated) {
-  //     navigate("/account");
-  //   }
-  // }, [isAuthenticated, navigate]);
+  };
 
   return (
     <div className="row signin m-0">

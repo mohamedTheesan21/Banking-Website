@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const dbConnect = require("./dbConnect");
@@ -64,7 +65,6 @@ app.use(express.static(path.join(__dirname, "build")));
 
 app.use("/user", userRouter);
 
-
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
@@ -73,11 +73,11 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token.split(" ")[1], "your_secret_key");
+    const decoded = jwt.verify(token.split(" ")[1], process.env.KEY);
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ message: "Invalid token",  });
+    return res.status(403).json({ message: "Invalid token" });
   }
 };
 
@@ -91,7 +91,6 @@ app.get("/account", verifyToken, async (req, res) => {
     res.status(404).json({ message: "User not found" });
   }
 });
-
 
 app.listen(3001, () => {
   console.log("server is running port 3001");

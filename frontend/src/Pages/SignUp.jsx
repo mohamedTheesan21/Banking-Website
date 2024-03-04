@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEmail } from "../Contexts/EmailContext";
-import { useAuth } from "../Contexts/Auth";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/SignUp.css";
 
@@ -10,8 +8,6 @@ function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { email } = useEmail();
-  const  {isAuthenticated, login} = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -26,21 +22,33 @@ function SignUp() {
       setError("");
       const formData = {
         username: username,
-        email: email,
         password: password,
       };
 
+      const token = localStorage.getItem("registerToken");
       try {
         const response = await fetch("http://localhost:3001/user/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(formData),
         });
         if (response.status === 200) {
-          login();
+          const data = await response.json(); // Parse response body as JSON
+          console.log("Sign in successful", data.token);
+          localStorage.setItem("token", data.token);
+          navigate("/account");
         }
+        else if (response.status === 400) {
+          const data = await response.json();
+          setError(data.message);
+        }
+      else if (response.status === 403) {
+        alert("session expired");
+        navigate("/register");
+      }
         if (!response.ok) {
           throw new Error("Failed to submit form");
         }
@@ -51,12 +59,7 @@ function SignUp() {
     }
   };
 
-  useEffect(() => {
-    console.log("isAuthenticated:", isAuthenticated);
-    if (isAuthenticated) {
-      navigate("/account");
-    }
-  }, [isAuthenticated, navigate]);
+  useEffect(() => {}, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

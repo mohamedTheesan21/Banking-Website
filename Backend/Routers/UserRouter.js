@@ -1,4 +1,4 @@
-
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
@@ -9,6 +9,21 @@ const {
 } = require("../verification");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).json({ message: "Token not provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token.split(" ")[1], process.env.KEY);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: "Invalid token" });
+  }
+};
 
 // Register a new user
 router.post("/register", async (req, res) => {
@@ -22,7 +37,14 @@ router.post("/register", async (req, res) => {
     if (existingUser) {
       if (!existingUser.auth) {
         generateVerificationCodeAndSave(formData.email);
-        res.status(200).send("Verification code sent");
+        const token = jwt.sign(
+          { accountID: formData.accountNumber },
+          process.env.KEY,
+          {
+            expiresIn: 5 * 60,
+          }
+        );
+        res.status(200).json({ token });
       } else {
         res.status(400).send("User already registered");
       }
@@ -36,20 +58,27 @@ router.post("/register", async (req, res) => {
 });
 
 // Verify user with verification code
-router.post("/verify", async (req, res) => {
-  const formData = req.body;
-  if (verifyUser(formData.email, formData.verificationCode)) {
-    res.status(200).send("User verified");
+router.post("/verify", verifyToken, async (req, res) => {
+  console.log("req.user", req.user)
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
   } else {
-    res.status(404).send("User not verified");
+    const user = await User.findOne({ accountID: req.user.accountID });
+    const formData = req.body;
+    if (verifyUser(user.email, formData.verificationCode)) {
+      res.status(200).send("User verified");
+    } else {
+      res.status(404).json({ message: "Invalid verification code" })
+    }
   }
 });
 
 // Sign up a new user
-router.post("/signup", async (req, res) => {
+router.post("/signup", verifyToken, async (req, res) => {
   console.log("Signup request received");
+  const user = await User.findOne({ accountID: req.user.accountID });
   const formData = req.body;
-  const existingUser = await User.findOne({ email: formData.email });
+  const existingUser = await User.findOne({ email: user.email });
   if (existingUser) {
     try {
       const newUser = new Auth({ username: formData.username });
@@ -58,11 +87,24 @@ router.post("/signup", async (req, res) => {
       // Save the new user
       await newUser.save();
       await existingUser.updateOne({ auth: newUser });
-      console.log("User registered");
-      res.status(200).send("User registered");
+      passport.authenticate("local")(req, res, () => {
+        const token = jwt.sign(
+          { username: formData.username },
+          process.env.KEY,
+          {
+            expiresIn: "1h",
+          }
+        );
+        res.status(200).json({ token });
+      });
     } catch (error) {
-      console.error("Error registering user:", error);
-      res.status(500).send("Error registering user");
+      if (error.code === 11000 && error.keyPattern && error.keyValue) {
+        // Duplicate key error (E11000)
+        res.status(400).json({ message: "Username is already taken" });
+      } else {
+        console.error("Error registering user:", error);
+        res.status(500).send("Error registering user");
+      }
     }
   }
 });
@@ -79,9 +121,13 @@ router.post("/signin", async (req, res) => {
       res.status(500).send("Error logging in");
     } else {
       passport.authenticate("local")(req, res, () => {
-        const token = jwt.sign({ username: req.body.username }, "your_secret_key", {
-            expiresIn: "1h"
-          });
+        const token = jwt.sign(
+          { username: req.body.username },
+          process.env.KEY,
+          {
+            expiresIn: "1h",
+          }
+        );
         res.status(200).json({ token });
       });
     }

@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { checkToken } from "../Tokens/CheckToken";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Verification.css";
-import { useEmail } from "../Contexts/EmailContext";
-import { useAuth } from "../Contexts/Auth";
 
 function Verification() {
-  const { email } = useEmail();
-  const { verified } = useAuth();
-
+  const [error, setError] = useState("");
   const [verificationCode, setVerificationCode] = useState([
     "",
     "",
@@ -37,6 +34,8 @@ function Verification() {
     return () => clearInterval(timer);
   }, [remainingTime, navigate]);
 
+
+
   function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -53,30 +52,47 @@ function Verification() {
     });
   };
 
+  
+  useEffect(() => {
+    checkToken("registerToken");
+    const token = localStorage.getItem("registerToken");
+    console.log("Fetching account details", token);
+    if (!token) {
+      navigate("/register");
+    }
+  },[navigate])
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = {
       verificationCode: verificationCode.join(""),
-      email: email,
     };
-
+    checkToken("registerToken");
+    const token = localStorage.getItem("registerToken");
     try {
       const response = await fetch("http://localhost:3001/user/verify", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(formData),
       });
 
       if (response.status === 200) {
-        verified();
         navigate("/signup");
       }
 
-      if (response.status === 404) {
-        console.log("Invalid verification code");
+      else if (response.status === 403) {
+        const data = await response.json();
+        console.log(data.message);
+        navigate("/register");
+      }
+
+      else if (response.status === 404) {
+        const data = await response.json();
+        console.log(data.message);
+        setError(data.message);
       }
 
       if (!response.ok) {
@@ -95,6 +111,7 @@ function Verification() {
       <div className="verification d-flex flex-column justify-content-center align-items-center">
         <h1>One final step! We need to verify your email</h1>
         <p>Please check your email for a verification code</p>
+        {error && <p className="error text-center ">{error}</p>}
         <div>
           {verificationCode.map((char, index) => (
             <input

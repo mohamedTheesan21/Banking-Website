@@ -2,17 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Register.css";
-import { useEmail } from "../Contexts/EmailContext";
-import { useAuth } from "../Contexts/Auth";
 
 function Register() {
   const [accountNumber, setAccountNumber] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
-  const { setEmailForContext } = useEmail();
   const [error, setError] = useState("");
-
-  const { register } = useAuth();
 
   const navigate = useNavigate();
 
@@ -34,7 +29,8 @@ function Register() {
       });
 
       if (response.status === 200) {
-        register();
+        const data = await response.json(); // Parse response body as JSON
+        localStorage.setItem("registerToken", data.token);
         navigate("/verification");
       }
 
@@ -84,10 +80,7 @@ function Register() {
         <input
           type="email"
           value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setEmailForContext(e.target.value);
-          }}
+          onChange={(e) => setEmail(e.target.value)}
           className="form-control"
           placeholder="Enter Email Address"
           required
