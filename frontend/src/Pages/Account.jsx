@@ -1,41 +1,50 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {checkToken} from "../Tokens/CheckToken"
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Account.css";
 // import { Link } from "react-router-dom";
 
 function Account() {
   const [user, setUser] = useState(null);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
 
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
   useEffect(() => {
+    checkToken("token")
     console.log("Fetching account details");
     // Retrieve JWT token from local storage
-    console.log("Token:", token);
+    const token = localStorage.getItem("token");
+    
     if (token) {
       // Send request to backend with token in the Authorization header
       fetch("http://localhost:3001/account", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+        },
+      }).then(async (response) => {
+        if (response.status === 200) {
+          const data = await response.json();
+          setUser(data.user);
+        } else if (response.status === 404) {
+          navigate("/signin");
+        } else {
+          throw new Error("Failed to load account details");
         }
-      })
-        .then(async (response) => {
-          if (response.status === 200) {
-            const data = await response.json();
-            console.log("Account details:", data);
-            setMessage(data.message);
-            setUser(data.user);
-          } else {
-            throw new Error("Failed to load account details");
-          }
-        })
-    } else {
-      setError("Token not found");
-      console.error("Token not found");
+      });
+    } else{
+      navigate("/signin");
     }
-  }, []);
+  }, [navigate]);
+
+  const handleClick = () => {
+    // Remove the token from local storage
+    localStorage.removeItem("token");
+
+    // Redirect the user to the sign-in page
+    navigate("/signin");
+  };
 
   // Check if user is null
   if (!user) {
@@ -63,6 +72,11 @@ function Account() {
             Transfers
           </a>
         </div>
+      </div>
+      <div>
+        <button className="btn btn-danger mt-5" onClick={handleClick}>
+          Logout
+        </button>
       </div>
     </div>
   );
