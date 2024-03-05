@@ -84,8 +84,10 @@ router.post("/signup", verifyToken, async (req, res) => {
       // Set the password using setPassword method provided by passport-local-mongoose
       await newUser.setPassword(formData.password);
       // Save the new user
-      await newUser.save();
-      await existingUser.updateOne({ auth: newUser });
+      await newUser.save().then(async (user) => {
+        console.log("User created:", user);
+        await existingUser.updateOne({ auth: newUser._id});
+      })
       passport.authenticate("local")(req, res, () => {
         const token = jwt.sign(
           { username: formData.username },

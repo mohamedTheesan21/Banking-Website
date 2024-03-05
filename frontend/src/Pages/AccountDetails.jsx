@@ -33,7 +33,6 @@ function AccountDetails() {
       navigate("/signin");
     }
   },[navigate]);
-  console.log(user);
   if (!user) {
     return (
       <div className="background w-100 d-flex flex-column justify-content-center align-items-center">

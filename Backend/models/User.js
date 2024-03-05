@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const authSchema = require("./Auth").schema;
 
 const userSchema = new mongoose.Schema({
   name: String,
@@ -8,7 +7,7 @@ const userSchema = new mongoose.Schema({
   accountID: String,
   balance: Number,
   branch: String,
-  auth: authSchema
+  auth: { type: mongoose.Schema.Types.ObjectId, ref: "Auth" }
 });
 
 

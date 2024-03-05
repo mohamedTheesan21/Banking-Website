@@ -66,7 +66,7 @@ function Account() {
           <a href="/account/details" className="btn btn-primary">
             Account Details
           </a>
-          <a href="/tranfer" className="btn btn-primary ">
+          <a href="/account/transfer" className="btn btn-primary ">
             Transfers
           </a>
         </div>
