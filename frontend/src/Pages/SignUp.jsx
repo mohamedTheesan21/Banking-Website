@@ -40,6 +40,7 @@ function SignUp() {
           console.log("Sign in successful", data.token);
           localStorage.setItem("token", data.token);
           localStorage.removeItem("registerToken");
+          localStorage.removeItem("emailVerified");
           navigate("/account");
         } else if (response.status === 400) {
           const data = await response.json();

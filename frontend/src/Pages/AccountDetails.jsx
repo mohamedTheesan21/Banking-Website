@@ -45,10 +45,10 @@ function AccountDetails() {
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="box">
         <h2 className="text-white">Account Details</h2>
-        <h4>Account No: {user.accountID}</h4>
-        <h4>Branch: {user.branch}</h4>
-        <h4>Account Holder Name: {user.name}</h4>
-        <h4>Total Avilable Balance: LKR {user.balance}</h4>
+        <h4><span className="label">Account No:</span> <span className="text-white">{user.accountID}</span></h4>
+      <h4><span className="label">Branch:</span> <span className="text-white">{user.branch}</span></h4>
+      <h4><span className="label">Account Holder Name:</span> <span className="text-white">{user.name}</span></h4>
+      <h4><span className="label">Total Available Balance:</span> <span className="text-white">LKR {user.balance}</span></h4>
       </div>
     </div>
   );
