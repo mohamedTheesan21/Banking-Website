@@ -5,6 +5,7 @@ const dbConnect = require("./dbConnect");
 const path = require("path");
 const cors = require("cors");
 const User = require("./models/User");
+const Auth = require("./models/Auth");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const session = require("express-session");
@@ -47,6 +48,7 @@ passport.deserializeUser((id, done) => {
 //   phoneNo: "1234567890",
 //   accountID: "83451212",
 //   balance: 1000.5,
+//   branch: "Mutur"
 // });
 
 // // Save the new user to the database
@@ -83,7 +85,8 @@ const verifyToken = (req, res, next) => {
 // Route to handle GET /account
 app.get("/account", verifyToken, async (req, res) => {
   // This endpoint is protected and requires a valid JWT token
-  const newUser = await User.findOne({ "auth.username": req.user.username });
+  const newAuth = await Auth.findOne({ username : req.user.username });
+  const newUser = await User.findOne({ auth: newAuth._id });
   if (newUser) {
     const user = {
       name: newUser.name,
@@ -98,6 +101,15 @@ app.get("/account", verifyToken, async (req, res) => {
     res.status(404).json({ message: "User not found" });
   }
 });
+
+// Route to handle POST /account/transfer
+app.post("/account/transfer", verifyToken, async (req, res) => {
+  const newAuth = await Auth.findOne({ username : req.user.username });
+  const newUser = await User.findOne({ auth: newAuth._id });
+  const formData = req.body;
+  console.log(formData);
+  console.log(newUser);
+})
 
 app.listen(3001, () => {
   console.log("server is running port 3001");
