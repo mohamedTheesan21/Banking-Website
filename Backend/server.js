@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const dbConnect = require("./dbConnect");
 const path = require("path");
 const cors = require("cors");
@@ -11,6 +12,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const session = require("express-session");
 const userRouter = require("./Routers/UserRouter");
 const jwt = require("jsonwebtoken");
+const Transfer = require("./models/Transfer");
 // const cookieParser = require("cookie-parser")
 
 const app = express();
@@ -42,7 +44,7 @@ passport.deserializeUser((id, done) => {
   });
 });
 
-// const newUser = new User({
+// const sender = new User({
 //   name: "Mohamed Theesan",
 //   email: "mohamedtheesan319@gmail.com",
 //   phoneNo: "1234567890",
@@ -52,7 +54,7 @@ passport.deserializeUser((id, done) => {
 // });
 
 // // Save the new user to the database
-// newUser
+// sender
 //   .save()
 //   .then((savedUser) => {
 //     console.log("User saved successfully:", savedUser);
@@ -85,16 +87,16 @@ const verifyToken = (req, res, next) => {
 // Route to handle GET /account
 app.get("/account", verifyToken, async (req, res) => {
   // This endpoint is protected and requires a valid JWT token
-  const newAuth = await Auth.findOne({ username : req.user.username });
-  const newUser = await User.findOne({ auth: newAuth._id });
-  if (newUser) {
+  const newAuth = await Auth.findOne({ username: req.user.username });
+  const sender = await User.findOne({ auth: newAuth._id });
+  if (sender) {
     const user = {
-      name: newUser.name,
-      email: newUser.email,
-      phoneNo: newUser.phoneNo,
-      accountID: newUser.accountID,
-      balance: newUser.balance,
-      branch: newUser.branch,
+      name: sender.name,
+      email: sender.email,
+      phoneNo: sender.phoneNo,
+      accountID: sender.accountID,
+      balance: sender.balance,
+      branch: sender.branch,
     };
     res.status(200).json({ message: "User found", user });
   } else {
@@ -104,12 +106,52 @@ app.get("/account", verifyToken, async (req, res) => {
 
 // Route to handle POST /account/transfer
 app.post("/account/transfer", verifyToken, async (req, res) => {
-  const newAuth = await Auth.findOne({ username : req.user.username });
-  const newUser = await User.findOne({ auth: newAuth._id });
-  const formData = req.body;
-  console.log(formData);
-  console.log(newUser);
-})
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const newAuth = await Auth.findOne({ username: req.user.username }).session(session);
+    const sender = await User.findOne({ auth: newAuth._id }).session(session);
+    const formData = req.body;
+
+    // Perform your transactional operations here
+
+    // Example: Update user balances
+    sender.balance -= parseFloat(formData.amount);
+    await sender.save();
+
+    const receiver = await User.findOne({accountID: formData.accountNo}).session(session);
+
+    if (!receiver) {
+      res.status(400).json({ message: "Invalid Account Number" });
+      return;
+    }
+    else{
+      receiver.balance += parseFloat(formData.amount);
+      await receiver.save();
+    }
+
+    // Example: Log the transfer
+    const transfer = new Transfer({
+      receiver: formData.receiverId,
+      amount: formData.amount,
+      description: formData.description,
+    });
+    await transfer.save();
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({message:"Transfer successful"});
+    console.log("Transfer successful");
+  } catch (error) {
+    // If any error occurs, abort the transaction
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error performing transfer:", error);
+    res.status(500).json({message:"Error performing transfer"});
+  }
+});
 
 app.listen(3001, () => {
   console.log("server is running port 3001");

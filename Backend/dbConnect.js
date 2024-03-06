@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const DB_URL = "mongodb://localhost:27017/bankDB";
+const DB_URL = "mongodb+srv://myAtlasDBUser:12345@myatlasclusteredu.zdyf7zp.mongodb.net/bankDB";
 
 async function dbConnect() {
   await mongoose
