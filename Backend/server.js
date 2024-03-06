@@ -132,7 +132,7 @@ app.post("/account/transfer", verifyToken, async (req, res) => {
 
     // Example: Log the transfer
     const transfer = new Transfer({
-      receiver: formData.receiverId,
+      receiver: receiver._id,
       amount: formData.amount,
       description: formData.description,
     });

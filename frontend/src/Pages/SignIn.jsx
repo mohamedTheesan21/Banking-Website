@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/SignIn.css";
 
@@ -8,6 +9,7 @@ function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -23,6 +25,7 @@ function SignIn() {
     };
 
     try {
+      setLoading(true);
       const response = await fetch("http://localhost:3001/user/signin", {
         method: "POST",
         headers: {
@@ -52,6 +55,11 @@ function SignIn() {
     } catch (err) {
       console.error("Error submitting form:", err.message);
     }
+    setLoading(false);
+  };
+
+  if(loading) {
+    return <Loading />
   };
 
   return (

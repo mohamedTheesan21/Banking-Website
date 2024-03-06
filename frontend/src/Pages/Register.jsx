@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Register.css";
 
@@ -8,6 +9,7 @@ function Register() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,6 +22,7 @@ function Register() {
       email,
     };
     try {
+      setLoading(true);
       const response = await fetch("http://localhost:3001/user/register", {
         method: "POST",
         headers: {
@@ -55,7 +58,12 @@ function Register() {
     } catch (err) {
       console.error("Error submitting form:", err.message);
     }
+    setLoading(false);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="background d-flex flex-column justify-content-center align-items-center ">
