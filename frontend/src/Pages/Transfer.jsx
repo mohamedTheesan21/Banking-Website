@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { checkToken } from "../Tokens/CheckToken";
 import { useNavigate } from "react-router-dom";
+import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Transfer.css";
 
@@ -61,11 +62,7 @@ function Transfer() {
   };
 
   if(loading){
-    return (
-      <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-        <h1 className="text-white">Loading...</h1>
-      </div>
-    );
+    return <Loading />
   }
 
   return (

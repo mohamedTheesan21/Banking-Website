@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/SignUp.css";
 
@@ -12,6 +13,7 @@ function SignUp() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,6 +29,7 @@ function SignUp() {
 
       const token = localStorage.getItem("registerToken");
       try {
+        setLoading(true);
         const response = await fetch("http://localhost:3001/user/signup", {
           method: "POST",
           headers: {
@@ -57,6 +60,7 @@ function SignUp() {
         console.error("Error submitting form:", err.message);
       }
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -72,6 +76,11 @@ function SignUp() {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="signup mx-auto">
