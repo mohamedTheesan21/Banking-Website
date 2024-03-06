@@ -16,5 +16,10 @@
     width: 40%;
     margin: 10px;
     border-radius: 0;
-    
+}
+
+.btn-danger{
+    border: none;
+    border-radius: 0;
+    width: 100px;
 }
