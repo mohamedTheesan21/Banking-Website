@@ -3,11 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { TransferDataProvider } from "./Contexts/TransferDataContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <TransferDataProvider>
+      <App />
+    </TransferDataProvider>
   </React.StrictMode>
 );
 
