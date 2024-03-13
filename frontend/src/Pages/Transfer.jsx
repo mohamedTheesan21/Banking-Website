@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { checkToken } from "../Tokens/CheckToken";
 import { useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading/Loading";
+import { useTransferData } from "../Contexts/TransferDataContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Transfer.css";
 
@@ -11,6 +12,8 @@ function Transfer() {
   const [description, setDescription] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const {transferData,setTransferData} = useTransferData();
 
   const navigate = useNavigate();
 
@@ -22,7 +25,15 @@ function Transfer() {
     if (!token) {
       navigate("/signin");
     }
-  })
+  },[navigate])
+
+  useEffect(() => {
+    if (transferData) {
+      setAccountNo(transferData.toAccount);
+      setAmount(transferData.amount);
+      setDescription(transferData.description);
+    }
+  }, [transferData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,14 +55,11 @@ function Transfer() {
         });
         if (response.status === 200) {
           const data = await response.json();
-          alert(data.message);
-          navigate("/account/transfer/details");
-        } else if (response.status === 400) {
-          const data = await response.json();
-          setMessage(data.message);
-        } else if (response.status === 403) {
-          alert("session expired");
-        } else if (response.status === 500) {
+          console.log("Transfer details:", data.transferData);
+          setTransferData(data.transferData);
+          navigate("/account/transfer/verify");
+        }
+        else{
           const data = await response.json();
           setMessage(data.message);
         }
@@ -76,6 +84,7 @@ function Transfer() {
               type="text"
               className="form-control"
               onChange={(e) => setAccountNo(e.target.value)}
+              value={accountNo}
               placeholder="Enter Account No"
               required
             />
@@ -86,6 +95,7 @@ function Transfer() {
               type="text"
               className="form-control"
               onChange={(e) => setAmount(e.target.value)}
+              value={amount}
               placeholder="Enter Amount"
               required
             />
@@ -93,6 +103,7 @@ function Transfer() {
               type="text"
               className="form-control"
               onChange={(e) => setDescription(e.target.value)}
+              value={description}
               placeholder="Enter Description"
               maxLength={16}
               required

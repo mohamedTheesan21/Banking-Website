@@ -105,7 +105,7 @@ app.get("/account", verifyToken, async (req, res) => {
 });
 
 // Route to handle POST /account/transfer
-app.post("/account/transfer", verifyToken, async (req, res) => {
+app.post("/account/transfer/verify", verifyToken, async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -113,22 +113,13 @@ app.post("/account/transfer", verifyToken, async (req, res) => {
     const sender = await User.findOne({ auth: newAuth._id }).session(session);
     const formData = req.body;
 
-    if (sender.balance < parseFloat(formData.amount)) {
-      res.status(400).json({ message: "Insufficient balance" });
-      return;
-    }
-
     // Example: Update user balances
     sender.balance -= parseFloat(formData.amount);
     await sender.save();
 
     const receiver = await User.findOne({accountID: formData.accountNo}).session(session);
 
-    if (!receiver) {
-      res.status(400).json({ message: "Invalid Account Number" });
-      return;
-    }
-    else{
+    if (receiver) {
       receiver.balance += parseFloat(formData.amount);
       await receiver.save();
     }
@@ -159,6 +150,36 @@ app.post("/account/transfer", verifyToken, async (req, res) => {
   }
 });
 
+app.post("/account/transfer", verifyToken, async (req, res) => {
+  const newAuth = await Auth.findOne({ username: req.user.username });
+  const sender = await User.findOne({ auth: newAuth._id });
+  const formData = req.body;
+
+  const receiver = await User.findOne({ accountID: formData.accountNo });
+
+  if (!receiver) {
+    res.status(400).json({ message: "Invalid Account Number" });
+    return;
+  }
+
+  if (sender.balance < parseFloat(formData.amount)) {
+    res.status(400).json({ message: "Insufficient balance" });
+    return;
+  }
+
+  const transferData = {
+    fromAccount: sender.accountID,
+    fromBranch: sender.branch,
+    toAccount: receiver.accountID,
+    receivername: receiver.name,
+    amount: formData.amount,
+    transferDate: new Date().toISOString().split("T")[0],
+    description: formData.description,
+  };
+
+  res.status(200).json({transferData});
+});
+
 // Route to handle GET /account/transfer/details
 app.get("/account/transfer/details", verifyToken, async (req, res) => {
   try {
@@ -167,11 +188,11 @@ app.get("/account/transfer/details", verifyToken, async (req, res) => {
 
     // Find transfers where the user is either the sender or the receiver
     const transfers = await Transfer.find({
-      $or: [{ sender: user._id }, { receiver: user._id }]
+      $or: [{ sender: user._id }, { receiver: user._id }],
     });
 
     // Determine if the user is the sender or receiver in each transfer
-    const transferDetails = transfers.map(transfer => {
+    const transferDetails = transfers.map((transfer) => {
       let role;
       if (transfer.sender.equals(user._id)) {
         role = "sender";
@@ -180,19 +201,16 @@ app.get("/account/transfer/details", verifyToken, async (req, res) => {
       }
       return {
         ...transfer.toObject(),
-        userRole: role
+        userRole: role,
       };
     });
 
-    
-    res.status(200).json({transferDetails: transferDetails});
+    res.status(200).json({ transferDetails: transferDetails });
   } catch (error) {
     console.error("Error finding transfer details:", error);
     res.status(500).json({ error: "Error finding transfer details" });
   }
 });
-
-
 
 app.listen(3001, () => {
   console.log("server is running port 3001");

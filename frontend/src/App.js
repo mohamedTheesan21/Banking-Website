@@ -9,6 +9,7 @@ import SignUp from "./Pages/SignUp";
 import AccountDetails from "./Pages/AccountDetails";
 import Transfer from "./Pages/Transfer";
 import TransferDetails from "./Pages/TransferDetails";
+import VerifyTransfer from "./Pages/VerifyTransfer";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/account/details" element={<AccountDetails />} />
         <Route path="/account/transfer" element={<Transfer /> }/>
         <Route path="/account/transfer/details" element={<TransferDetails />} />
+        <Route path="/account/transfer/verify" element={<VerifyTransfer />} />
       </Routes>
     </BrowserRouter>
   );
