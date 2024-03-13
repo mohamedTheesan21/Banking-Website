@@ -45,7 +45,7 @@ function Transfer() {
         if (response.status === 200) {
           const data = await response.json();
           alert(data.message);
-          navigate("/account");
+          navigate("/account/transfer/details");
         } else if (response.status === 400) {
           const data = await response.json();
           setMessage(data.message);

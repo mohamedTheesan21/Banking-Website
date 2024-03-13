@@ -8,6 +8,7 @@ import Verification from "./Pages/Verification";
 import SignUp from "./Pages/SignUp";
 import AccountDetails from "./Pages/AccountDetails";
 import Transfer from "./Pages/Transfer";
+import TransferDetails from "./Pages/TransferDetails";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/account/details" element={<AccountDetails />} />
         <Route path="/account/transfer" element={<Transfer /> }/>
+        <Route path="/account/transfer/details" element={<TransferDetails />} />
       </Routes>
     </BrowserRouter>
   );

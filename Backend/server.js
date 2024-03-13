@@ -113,7 +113,10 @@ app.post("/account/transfer", verifyToken, async (req, res) => {
     const sender = await User.findOne({ auth: newAuth._id }).session(session);
     const formData = req.body;
 
-    // Perform your transactional operations here
+    if (sender.balance < parseFloat(formData.amount)) {
+      res.status(400).json({ message: "Insufficient balance" });
+      return;
+    }
 
     // Example: Update user balances
     sender.balance -= parseFloat(formData.amount);
@@ -132,7 +135,10 @@ app.post("/account/transfer", verifyToken, async (req, res) => {
 
     // Example: Log the transfer
     const transfer = new Transfer({
+      sender: sender._id,
+      senderBalance: sender.balance,
       receiver: receiver._id,
+      receiverBalance: receiver.balance,
       amount: formData.amount,
       description: formData.description,
     });
@@ -152,6 +158,41 @@ app.post("/account/transfer", verifyToken, async (req, res) => {
     res.status(500).json({message:"Error performing transfer"});
   }
 });
+
+// Route to handle GET /account/transfer/details
+app.get("/account/transfer/details", verifyToken, async (req, res) => {
+  try {
+    const newAuth = await Auth.findOne({ username: req.user.username });
+    const user = await User.findOne({ auth: newAuth._id });
+
+    // Find transfers where the user is either the sender or the receiver
+    const transfers = await Transfer.find({
+      $or: [{ sender: user._id }, { receiver: user._id }]
+    });
+
+    // Determine if the user is the sender or receiver in each transfer
+    const transferDetails = transfers.map(transfer => {
+      let role;
+      if (transfer.sender.equals(user._id)) {
+        role = "sender";
+      } else {
+        role = "receiver";
+      }
+      return {
+        ...transfer.toObject(),
+        userRole: role
+      };
+    });
+
+    
+    res.status(200).json({transferDetails: transferDetails});
+  } catch (error) {
+    console.error("Error finding transfer details:", error);
+    res.status(500).json({ error: "Error finding transfer details" });
+  }
+});
+
+
 
 app.listen(3001, () => {
   console.log("server is running port 3001");

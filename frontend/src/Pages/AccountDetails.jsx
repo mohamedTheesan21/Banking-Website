@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {checkToken} from "../Tokens/CheckToken";
+import Loading from "../Components/Loading/Loading"
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function AccountDetails() {
@@ -34,12 +35,9 @@ function AccountDetails() {
     }
   },[navigate]);
   if (!user) {
-    return (
-      <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-        <h1 className="text-white">Loading...</h1>
-      </div>
-    );
+    return <Loading />;
   }
+
   return (
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="box">
