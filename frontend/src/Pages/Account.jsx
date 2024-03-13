@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { checkToken } from "../Tokens/CheckToken";
+import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Account.css";
 
@@ -46,11 +47,7 @@ function Account() {
 
   // Check if user is null
   if (!user) {
-    return (
-      <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-        <h1 className="text-white">Loading...</h1>
-      </div>
-    );
+    return <Loading />;
   }
 
   const balance = user.balance || 0;
@@ -68,6 +65,9 @@ function Account() {
           </a>
           <a href="/account/transfer" className="btn btn-primary ">
             Transfers
+          </a>
+          <a href="/account/transfer/details" className="btn btn-primary ">
+            Transfer Details
           </a>
         </div>
       </div>
