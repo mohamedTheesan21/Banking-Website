@@ -13,6 +13,7 @@ const session = require("express-session");
 const userRouter = require("./Routers/UserRouter");
 const jwt = require("jsonwebtoken");
 const Transfer = require("./models/Transfer");
+const { sendEmail } = require("./verificationEmail");
 // const cookieParser = require("cookie-parser")
 
 const app = express();
@@ -109,7 +110,9 @@ app.post("/account/transfer/verify", verifyToken, async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const newAuth = await Auth.findOne({ username: req.user.username }).session(session);
+    const newAuth = await Auth.findOne({ username: req.user.username }).session(
+      session
+    );
     const sender = await User.findOne({ auth: newAuth._id }).session(session);
     const formData = req.body;
 
@@ -117,7 +120,9 @@ app.post("/account/transfer/verify", verifyToken, async (req, res) => {
     sender.balance -= parseFloat(formData.amount);
     await sender.save();
 
-    const receiver = await User.findOne({accountID: formData.accountNo}).session(session);
+    const receiver = await User.findOne({
+      accountID: formData.accountNo,
+    }).session(session);
 
     if (receiver) {
       receiver.balance += parseFloat(formData.amount);
@@ -139,14 +144,20 @@ app.post("/account/transfer/verify", verifyToken, async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
-    res.status(200).json({message:"Transfer successful"});
+    res.status(200).json({ message: "Transfer successful" });
+    sendEmail(receiver.email, "Transfer Confirmation", "transfer", {
+      amount: formData.amount,
+      senderName: sender.name,
+      recipientName: receiver.name,
+      transferDate: new Date().toISOString().split("T")[0],
+    });
     console.log("Transfer successful");
   } catch (error) {
     // If any error occurs, abort the transaction
     await session.abortTransaction();
     session.endSession();
     console.error("Error performing transfer:", error);
-    res.status(500).json({message:"Error performing transfer"});
+    res.status(500).json({ message: "Error performing transfer" });
   }
 });
 
@@ -177,7 +188,7 @@ app.post("/account/transfer", verifyToken, async (req, res) => {
     description: formData.description,
   };
 
-  res.status(200).json({transferData});
+  res.status(200).json({ transferData });
 });
 
 // Route to handle GET /account/transfer/details

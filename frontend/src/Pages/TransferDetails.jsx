@@ -23,7 +23,6 @@ function TransferDetails() {
       }).then(async (response) => {
         if (response.status === 200) {
           const data = await response.json();
-          console.log("Transfer details:", data.transferDetails);
           setTransferDetails(data.transferDetails);
         } else {
           navigate("/account");
@@ -40,7 +39,7 @@ function TransferDetails() {
 
   return (
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-      <h1>Transfer Details</h1>
+      <h1 style={{color:"white"}}>Transfer Details</h1>
       <div className="w-75">
         <table className="table table-striped">
           <thead>
