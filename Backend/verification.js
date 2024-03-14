@@ -1,22 +1,25 @@
+const { json } = require("body-parser");
 const Verify = require("./models/Verify");
-const {
-  sendEmail
-} = require("./verificationEmail");
+const { sendEmail } = require("./verificationEmail");
 
-const generateVerificationCode =  (length) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let code = '';
-    for (let i = 0; i < length; i++) {
-        code += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return code;
-}
+const generateVerificationCode = (length) => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let code = "";
+  for (let i = 0; i < length; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+};
 
 // Generate verification code and store it with timestamp
 const generateVerificationCodeAndSave = async (email) => {
   const verificationCode = generateVerificationCode(6);
-    // sendEmail(email, 'Verification Code', `Your verification code is: ${verificationCode}`);
-    sendEmail(email, verificationCode);
+  // sendEmail(email, 'Verification Code', `Your verification code is: ${verificationCode}`);
+  const Variables = {
+    verification: verificationCode,
+  };
+  sendEmail(email, "Verification Code", "verification", Variables);
   const timestamp = Date.now(); // Current timestamp
   // Save the verification code and timestamp to the database
   await saveVerificationCodeToDatabase(email, verificationCode, timestamp);
@@ -83,32 +86,33 @@ const saveVerificationCodeToDatabase = async (
 
 const getStoredCodeAndTimestamp = async (email) => {
   // Retrieve the stored verification code and timestamp from the database for the specified user
-    const storedVerification = await Verify.findOne({ email: email });
-    if (storedVerification) {
-      return {
-        verificationCode: storedVerification.verificationCode,
-        timestamp: storedVerification.timestamp,
-      };
-    } else {
-        return null;
-    }
+  const storedVerification = await Verify.findOne({ email: email });
+  if (storedVerification) {
+    return {
+      verificationCode: storedVerification.verificationCode,
+      timestamp: storedVerification.timestamp,
+    };
+  } else {
+    return null;
+  }
 };
 
 const findExpiredVerificationCodes = async () => {
   // Find all verification codes in the database that have expired
-    const currentTimestamp = Date.now();
-    const expiredCodes = await Verify.find({
-      timestamp: { $lt: currentTimestamp - 2 * 60 * 1000 },
-    });
-    // console.log("Expired verification codes:", currentTimestamp);
+  const currentTimestamp = Date.now();
+  const expiredCodes = await Verify.find({
+    timestamp: { $lt: currentTimestamp - 2 * 60 * 1000 },
+  });
+  // console.log("Expired verification codes:", currentTimestamp);
 
-    return expiredCodes;
+  return expiredCodes;
 };
 
 const deleteExpiredVerificationCodes = async (expiredCodes) => {
   // Delete the expired verification codes from the database
-    await Verify.deleteMany({ _id: { $in: expiredCodes.map((code) => code._id) } });
+  await Verify.deleteMany({
+    _id: { $in: expiredCodes.map((code) => code._id) },
+  });
 };
-
 
 module.exports = { generateVerificationCodeAndSave, verifyUser };

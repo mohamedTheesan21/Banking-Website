@@ -85,7 +85,7 @@ router.post("/signup", verifyToken, async (req, res) => {
       await newUser.setPassword(formData.password);
       // Save the new user
       await newUser.save().then(async (user) => {
-        console.log("User created:", user);
+        console.log("User created successfully.");
         await existingUser.updateOne({ auth: newUser._id});
       })
       passport.authenticate("local")(req, res, () => {
