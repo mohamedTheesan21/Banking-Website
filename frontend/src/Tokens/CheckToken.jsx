@@ -12,6 +12,7 @@ const checkToken = (tokenName) => {
   if (token){
     if (isTokenExpired(token)) {
         // Token is expired, remove it from localStorage
+        localStorage.removeItem("transferData");
         localStorage.removeItem(tokenName);
         console.log();
         console.log("Token expired, removed from localStorage");

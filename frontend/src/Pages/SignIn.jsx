@@ -39,12 +39,10 @@ function SignIn() {
         console.log("Sign in successful", data.token);
         localStorage.setItem("token", data.token);
         navigate("/account");
-      }
-      else if (response.status === 401) {
+      } else if (response.status === 401) {
         const data = await response.json();
         setMessage(data.message);
-      }
-      else if (response.status === 500) {
+      } else if (response.status === 500) {
         const data = await response.json();
         setMessage(data.message);
       }
@@ -58,14 +56,14 @@ function SignIn() {
     setLoading(false);
   };
 
-  if(loading) {
-    return <Loading />
-  };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="row signin m-0">
       <div className="col-md-8 col-sm-12 mx-auto signin-left p-0">
-        <h1>Sign In</h1>
+        <h1>SIGN IN</h1>
         {message && <div className="alert alert-danger">{message}</div>}
         <form onSubmit={handleSubmit}>
           <input
@@ -96,7 +94,7 @@ function SignIn() {
             )}
           </div>
           <button type="submit" className="btn btn-primary">
-            Sign In
+            SIGN IN
           </button>
         </form>
       </div>
