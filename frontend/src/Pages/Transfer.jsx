@@ -55,7 +55,6 @@ function Transfer() {
         });
         if (response.status === 200) {
           const data = await response.json();
-          console.log("Transfer details:", data.transferData);
           setTransferData(data.transferData);
           navigate("/account/transfer/verify");
         }

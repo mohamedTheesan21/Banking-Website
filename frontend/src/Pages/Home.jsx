@@ -7,7 +7,7 @@ function Home() {
     return (
         <div className="flex flex-column background">
             <div className="d-flex button-box m-auto">
-                <a href="/signin" className="btn btn-light">Sign In</a>
+                <a href="/signin" className="btn btn-light">SIGN IN</a>
                 <a href="mailto:example@gmail.com" className="btn btn-light">Contact Us</a>
             </div>
             <div className="d-flex justify-content-center mt-5">

@@ -1,7 +1,7 @@
 const Verify = require("./models/Verify");
 const {
-  sendVerificationEmail
-} = require("./varificationEmail");
+  sendEmail
+} = require("./verificationEmail");
 
 const generateVerificationCode =  (length) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -15,7 +15,8 @@ const generateVerificationCode =  (length) => {
 // Generate verification code and store it with timestamp
 const generateVerificationCodeAndSave = async (email) => {
   const verificationCode = generateVerificationCode(6);
-    // sendVerificationEmail(email, verificationCode);
+    // sendEmail(email, 'Verification Code', `Your verification code is: ${verificationCode}`);
+    sendEmail(email, verificationCode);
   const timestamp = Date.now(); // Current timestamp
   // Save the verification code and timestamp to the database
   await saveVerificationCodeToDatabase(email, verificationCode, timestamp);
@@ -54,7 +55,7 @@ const cleanupExpiredVerificationCodes = async () => {
 };
 
 // Set up a timer or cron job to call cleanupExpiredVerificationCodes periodically
-setInterval(cleanupExpiredVerificationCodes, 10000); // Run every minute
+setInterval(cleanupExpiredVerificationCodes, 120000); // Run every minute
 
 // Helper functions for database operations
 const saveVerificationCodeToDatabase = async (
