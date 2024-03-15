@@ -14,6 +14,7 @@ const options = {
   title: "Total Sent and Received Amounts",
   is3D: true,
   backgroundColor: "transparent",
+  colors: ["red", "green"],
 };
 
 function PieChart(props) {
