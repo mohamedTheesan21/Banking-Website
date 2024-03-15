@@ -4,9 +4,14 @@ import { checkToken } from "../Tokens/CheckToken";
 import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../Components/Navbar/Navbar";
+import SortByDate from "../Models/SortByDate";
 
 function TransferDetails() {
   const [transferDetails, setTransferDetails] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const [modalShow, setModalShow] = useState(false);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -38,11 +43,53 @@ function TransferDetails() {
     return <Loading />;
   }
 
+  const handleClick = () => {
+    setModalShow(true);
+  };
+
+  const handleFilter = () => {
+    const filteredTransfers = transferDetails.filter((transfer) => {
+      const transferDate = new Date(transfer.date);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+  
+      return (!start || transferDate >= start) && (!end || transferDate <= end);
+    });
+    setTransferDetails(filteredTransfers);
+  }
+  
+
   return (
     <div>
       <Navbar />
       <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-        <h1 style={{ color: "white" }}>Transfer Details</h1>
+        <div className="d-flex flex-row justify-content-between w-75">
+          <h1 style={{ color: "white" }}>Transfer Details</h1>
+          <button className="btn btn-light px-4 py-0 my-2 rounded-0" onClick={handleClick}>
+            Filter by Date
+          </button>
+          {modalShow ? (
+            <SortByDate
+              show={modalShow}
+              onHide={() => {
+                setModalShow(false);
+                handleFilter();
+              }}
+              onChange={(e) => {
+                if (e.target.className === "start-date") {
+                  setStartDate(e.target.value);
+                  console.log("Start",startDate)
+                } else {
+                  setEndDate(e.target.value);
+                  console.log("End",endDate)
+                }
+              }}
+            />
+          ) : (
+            <></>
+          )}
+        </div>
+
         <div className="w-75 mh-50 overflow-auto" style={{ maxHeight: "70vh" }}>
           <table className="table table-striped">
             <thead>
