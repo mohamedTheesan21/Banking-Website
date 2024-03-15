@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-
-const DB_URL = "mongodb+srv://admin:12345@myatlasclusteredu.zdyf7zp.mongodb.net/bankDB";
+require("dotenv").config();
+const password = process.env.DB_PASSWORD;
+const DB_URL = `mongodb+srv://admin:${password}@myatlasclusteredu.zdyf7zp.mongodb.net/bankDB`;;
 
 async function dbConnect() {
   await mongoose
