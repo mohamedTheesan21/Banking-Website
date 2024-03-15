@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
-import {checkToken} from "../Tokens/CheckToken";
-import Loading from "../Components/Loading/Loading"
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { checkToken } from "../Tokens/CheckToken";
+import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../Components/Navbar/Navbar";
 
@@ -34,7 +34,7 @@ function AccountDetails() {
     } else {
       navigate("/signin");
     }
-  },[navigate]);
+  }, [navigate]);
   if (!user) {
     return <Loading />;
   }
@@ -42,15 +42,37 @@ function AccountDetails() {
   return (
     <div>
       <Navbar />
-    <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-      <div className="box">
-        <h2 className="text-white">Account Details</h2>
-        <h4><span className="label">Account No:</span> <span className="text-white">{user.accountID}</span></h4>
-      <h4><span className="label">Branch:</span> <span className="text-white">{user.branch}</span></h4>
-      <h4><span className="label">Account Holder Name:</span> <span className="text-white">{user.name}</span></h4>
-      <h4><span className="label">Total Available Balance:</span> <span className="text-white">LKR {user.balance}</span></h4>
+      <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
+        <div className="w-50">
+          <table className="table table-striped">
+            <thead>
+              <tr className="table-primary">
+                <th colSpan="2" className="align-middle text-center ">
+                  Account Details
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Account No:</td>
+                <td>{user.accountID}</td>
+              </tr>
+              <tr>
+                <td>Branch:</td>
+                <td>{user.branch}</td>
+              </tr>
+              <tr>
+                <td>Account Holder Name:</td>
+                <td>{user.name}</td>
+              </tr>
+              <tr>
+                <td>Total Available Balance:</td>
+                <td>LKR {user.balance}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

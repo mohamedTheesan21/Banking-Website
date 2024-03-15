@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading/Loading";
 import { useTransferData } from "../Contexts/TransferDataContext";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./CSS/Transfer.css";
 import Navbar from "../Components/Navbar/Navbar";
 
 function Transfer() {
