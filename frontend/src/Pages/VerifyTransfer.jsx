@@ -4,6 +4,7 @@ import { checkToken } from "../Tokens/CheckToken";
 import Loading from "../Components/Loading/Loading";
 import { useTransferData } from "../Contexts/TransferDataContext";
 import "bootstrap/dist/css/bootstrap.min.css";
+import TransferSuccess from "../Models/TransferSuccess";
 
 function VerifyTransfer() {
   const { transferData } = useTransferData();
@@ -19,18 +20,20 @@ function VerifyTransfer() {
   const [transferDate, setTransferDate] = useState("");
   const [description, setDescription] = useState("");
 
+  const [modalShow, setModalShow] = useState(false);
+
   useEffect(() => {
     console.log("Transfer Data:");
     if (!transferData) {
       navigate("/account/transfer");
-    }else{
-        setFromAccount(transferData.fromAccount);
-        setFromBranch(transferData.fromBranch);
-        setToAccount(transferData.toAccount);
-        setReceiverName(transferData.receivername);
-        setAmount(transferData.amount);
-        setTransferDate(transferData.transferDate);
-        setDescription(transferData.description);
+    } else {
+      setFromAccount(transferData.fromAccount);
+      setFromBranch(transferData.fromBranch);
+      setToAccount(transferData.toAccount);
+      setReceiverName(transferData.receivername);
+      setAmount(transferData.amount);
+      setTransferDate(transferData.transferDate);
+      setDescription(transferData.description);
     }
   }, [navigate, transferData]);
 
@@ -67,8 +70,7 @@ function VerifyTransfer() {
       );
       if (response.status === 200) {
         const data = await response.json();
-        alert(data.message);
-        navigate("/account/transfer/details");
+        setModalShow(true);
       } else if (response.status === 400) {
         const data = await response.json();
         setMessage(data.message);
@@ -87,9 +89,22 @@ function VerifyTransfer() {
   if (loading) {
     return <Loading />;
   }
+
+  if (modalShow) {
+    return (
+      <TransferSuccess
+        show={modalShow}
+        onHide={() => {
+          setModalShow(false);
+          navigate("/account/transfer/details");
+        }}
+      />
+    );
+  }
   return (
     <div className="background-full w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="w-50">
+        {message && <p className="alert alert-danger">{message}</p>}
         <table className="table table-striped">
           <thead>
             <tr className="table-primary">
@@ -132,7 +147,10 @@ function VerifyTransfer() {
         <a href="/account/transfer" className="btn btn-danger me-5 ms-0">
           Change
         </a>
-        <button onClick={handleClick} className="btn btn-success rounded-0 me-0 px-4">
+        <button
+          onClick={handleClick}
+          className="btn btn-success rounded-0 me-0 px-4"
+        >
           Confirm
         </button>
       </div>
