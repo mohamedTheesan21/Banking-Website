@@ -1,20 +1,5 @@
-.button-box{
-    width: 100%;
-    padding-top: 30vh;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-
-.button-box a{
-    width: 40%;
-    margin: auto;
-    margin-top: 10px;
-    padding: 10px;
-    font-weight: 600;
-}
-
-.background{
-    height: 90vh;
+.background-full{
+    height: 100vh;
 
     background-image: url("../../../public/Images/background2.jpg");
     background-size: cover;
@@ -25,4 +10,8 @@
     /* Fixes the background image, so it doesn't scroll with the content */
     background-position: center center;
     /* Centers the image horizontally and vertically */
+}
+
+.container{
+    background-color: rgb(197, 198, 199);
 }

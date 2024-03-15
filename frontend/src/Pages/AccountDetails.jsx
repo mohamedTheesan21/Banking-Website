@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {checkToken} from "../Tokens/CheckToken";
 import Loading from "../Components/Loading/Loading"
 import "bootstrap/dist/css/bootstrap.min.css";
+import Navbar from "../Components/Navbar/Navbar";
 
 function AccountDetails() {
   const [user, setUser] = useState(null);
@@ -39,6 +40,8 @@ function AccountDetails() {
   }
 
   return (
+    <div>
+      <Navbar />
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="box">
         <h2 className="text-white">Account Details</h2>
@@ -47,6 +50,7 @@ function AccountDetails() {
       <h4><span className="label">Account Holder Name:</span> <span className="text-white">{user.name}</span></h4>
       <h4><span className="label">Total Available Balance:</span> <span className="text-white">LKR {user.balance}</span></h4>
       </div>
+    </div>
     </div>
   );
 }

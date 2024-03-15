@@ -82,7 +82,7 @@ function SignUp() {
   }
 
   return (
-    <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
+    <div className="background-full w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="signup mx-auto">
         <h1>Sign Up</h1>
         <form onSubmit={handleSubmit} action="post">

@@ -1,0 +1,17 @@
+.nav-bar{
+    background-color: #111621;
+}
+
+.nav-bar a{
+    color: white;
+}
+
+.nav-bar a:hover{
+    color: #b8b6b6;
+}
+
+.nav-bar button{
+    background-color: #ffffff;
+    color: white;
+    border: none;
+}
