@@ -43,7 +43,7 @@ function TransferDetails() {
       <Navbar />
       <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
         <h1 style={{ color: "white" }}>Transfer Details</h1>
-        <div className="w-75 mh-50 overflow-auto" style={{ maxHeight: "80vh" }}>
+        <div className="w-75 mh-50 overflow-auto" style={{ maxHeight: "70vh" }}>
           <table className="table table-striped">
             <thead>
               <tr className="table-primary ">
