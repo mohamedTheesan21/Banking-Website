@@ -4,6 +4,7 @@ import { checkToken } from "../Tokens/CheckToken";
 import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Account.css";
+import Navbar from "../Components/Navbar/Navbar";
 
 function Account() {
   const [user, setUser] = useState(null);
@@ -53,7 +54,11 @@ function Account() {
   const balance = user.balance || 0;
 
   return (
+    <div>
+      <Navbar />
+    
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
+      
       <h1 className="text-white shadow-lg ">Hello, {user.name}</h1>
       <div className="row m-0 box">
         <div className="col-md-6 col-sm-12 mx-auto center">
@@ -76,6 +81,7 @@ function Account() {
           Logout
         </button>
       </div>
+    </div>
     </div>
   );
 }

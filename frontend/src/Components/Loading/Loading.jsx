@@ -22,7 +22,7 @@ function Loading() {
   }, []); // Run only once when the component mounts
 
   return (
-    <div className="background d-flex flex-column justify-content-center align-items-center ">
+    <div className="background-full d-flex flex-column justify-content-center align-items-center ">
       <div
         id="animation-container"
         style={{ width: "50%", height: "50%" }}

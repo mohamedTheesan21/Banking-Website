@@ -10,6 +10,9 @@ import AccountDetails from "./Pages/AccountDetails";
 import Transfer from "./Pages/Transfer";
 import TransferDetails from "./Pages/TransferDetails";
 import VerifyTransfer from "./Pages/VerifyTransfer";
+import AboutUs from "./Pages/Home/AboutUs";
+import ContactUs from "./Pages/Home/ContactUs";
+import FAQ from "./Pages/Home/FAQ";
 
 function App() {
   return (
@@ -25,6 +28,9 @@ function App() {
         <Route path="/account/transfer" element={<Transfer /> }/>
         <Route path="/account/transfer/details" element={<TransferDetails />} />
         <Route path="/account/transfer/verify" element={<VerifyTransfer />} />
+        <Route path="/aboutus" element={<AboutUs />} />
+        <Route path="/contactus" element={<ContactUs />} />
+        <Route path="/faq" element={<FAQ />} />
       </Routes>
     </BrowserRouter>
   );

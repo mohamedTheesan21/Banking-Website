@@ -5,6 +5,7 @@ import Loading from "../Components/Loading/Loading";
 import { useTransferData } from "../Contexts/TransferDataContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Transfer.css";
+import Navbar from "../Components/Navbar/Navbar";
 
 function Transfer() {
   const [accountNo, setAccountNo] = useState("");
@@ -73,6 +74,8 @@ function Transfer() {
   }
 
   return (
+    <div>
+      <Navbar />
     <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="box w-50">
         <form onSubmit={handleSubmit} action="post" className="form-elements transfer w-100">
@@ -115,6 +118,7 @@ function Transfer() {
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 }

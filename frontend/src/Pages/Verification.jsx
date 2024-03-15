@@ -116,7 +116,7 @@ function Verification() {
   };
 
   return (
-    <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
+    <div className="background-full w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="verification d-flex flex-column justify-content-center align-items-center">
         <h1>One final step! We need to verify your email</h1>
         <p>Please check your email for a verification code</p>

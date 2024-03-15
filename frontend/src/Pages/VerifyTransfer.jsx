@@ -88,7 +88,7 @@ function VerifyTransfer() {
     return <Loading />;
   }
   return (
-    <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
+    <div className="background-full w-100 d-flex flex-column justify-content-center align-items-center">
       <div className="w-50">
         <table className="table table-striped">
           <thead>
