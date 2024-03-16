@@ -1,0 +1,17 @@
+.background-full{
+    height: 100vh;
+
+    background-image: url("../../../public/Images/background2.jpg");
+    background-size: cover;
+    /* Ensures the image covers the entire background */
+    background-repeat: no-repeat;
+    /* Prevents image repetition */
+    background-attachment: fixed;
+    /* Fixes the background image, so it doesn't scroll with the content */
+    background-position: center center;
+    /* Centers the image horizontally and vertically */
+}
+
+.container{
+    background-color: rgb(197, 198, 199);
+}
