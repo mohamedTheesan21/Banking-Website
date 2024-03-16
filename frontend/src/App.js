@@ -13,6 +13,9 @@ import VerifyTransfer from "./Pages/VerifyTransfer";
 import AboutUs from "./Pages/Home/AboutUs";
 import ContactUs from "./Pages/Home/ContactUs";
 import FAQ from "./Pages/Home/FAQ";
+import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
+import FPVerification from "./Pages/ForgotPassword/FPVerification";
+import ChangePassword from "./Pages/ForgotPassword/ChangePassword";
 
 function App() {
   return (
@@ -31,6 +34,9 @@ function App() {
         <Route path="/aboutus" element={<AboutUs />} />
         <Route path="/contactus" element={<ContactUs />} />
         <Route path="/faq" element={<FAQ />} />
+        <Route path="/forgot password" element={<ForgotPassword />} />
+        <Route path="/FPVerification" element={<FPVerification />} />
+        <Route path="/forgot password/reset password" element={<ChangePassword />} />
       </Routes>
     </BrowserRouter>
   );

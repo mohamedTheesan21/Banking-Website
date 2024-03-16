@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -8,10 +8,14 @@ function Register() {
   const [accountNumber, setAccountNumber] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState("If you don't have an account, please go to the nearest branch to open an account.");
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    localStorage.removeItem("emailVerified");
+  },[])
 
   const handleSubmit = async (e) => {
     e.preventDefault();

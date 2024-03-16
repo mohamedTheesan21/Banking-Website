@@ -3,8 +3,6 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
 function TransferSuccess(props) {
-    const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
     
   return (
     <Modal
@@ -27,7 +25,7 @@ function TransferSuccess(props) {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button className="rounded-0" onClick={props.onHide}>Sort</Button>
+        <Button className="rounded-0" onClick={props.onApply}>Sort</Button>
       </Modal.Footer>
     </Modal>
   );

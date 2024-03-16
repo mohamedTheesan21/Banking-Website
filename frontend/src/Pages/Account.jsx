@@ -75,7 +75,6 @@ function Account() {
         totalReceived += transfer.amount;
       }
     })
-    console.log(totalSent, totalReceived);
   }
 
   const data = [

@@ -92,7 +92,9 @@ function SignIn() {
                 onClick={togglePasswordVisibility}
               ></i>
             )}
+            <a href="/forgot password">forgot password</a>
           </div>
+          
           <button type="submit" className="btn btn-primary">
             SIGN IN
           </button>

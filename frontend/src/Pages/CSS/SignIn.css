@@ -1,79 +1,80 @@
-.signin-right{
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+.signin-right {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 
-    background-image: url("../../../public/Images/background2.jpg");
-    background-size: cover;
-    /* Ensures the image covers the entire background */
-    background-repeat: no-repeat;
-    /* Prevents image repetition */
-    background-attachment: fixed;
-    /* Fixes the background image, so it doesn't scroll with the content */
-    background-position: center center;
-    /* Centers the image horizontally and vertically */
+  background-image: url("../../../public/Images/background2.jpg");
+  background-size: cover;
+  /* Ensures the image covers the entire background */
+  background-repeat: no-repeat;
+  /* Prevents image repetition */
+  background-attachment: fixed;
+  /* Fixes the background image, so it doesn't scroll with the content */
+  background-position: center center;
+  /* Centers the image horizontally and vertically */
 }
 
-.signin-right h1{
-    color: rgb(255, 255, 255);
+.signin-right h1 {
+  color: rgb(255, 255, 255);
 }
 
-.signin-right a{
-    width: 50%;
-    border-radius: 30px;
-    margin-top: 10px;
-    background-color: rgb(255, 255, 255);
-    color: black;
+.signin-right a {
+  width: 50%;
+  border-radius: 30px;
+  margin-top: 10px;
+  background-color: rgb(255, 255, 255);
+  color: black;
 }
 
-.signin-right a:hover{
-    background-color: rgb(198, 194, 194);
-    color: black;
+.signin-right a:hover {
+  background-color: rgb(198, 194, 194);
+  color: black;
 }
 
-
-
-
-.signin-left{
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-
+.signin-left {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.signin-left h1{
-    color: rgb(2, 11, 45);
+.signin-left h1 {
+  color: rgb(2, 11, 45);
 }
 
-.signin-left input{
-    width: 350px;
-    border-radius: 30px;
-    background-color: rgb(213, 222, 254);
-    margin: auto;
-    margin-top: 10px;
+.signin-left input {
+  width: 350px;
+  border-radius: 30px;
+  background-color: rgb(213, 222, 254);
+  margin: auto;
+  margin-top: 10px;
 }
 
-.eye-icon-signin{
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
+.eye-icon-signin {
+  position: absolute;
+  right: 10px;
+  top: 30%;
+  transform: translateY(-50%);
+  cursor: pointer;
 }
 
-.signin-left button{
-    width: 160px;
-    border-radius: 30px;
-    background-color: rgb(2, 11, 45);
-    margin-top: 10px;
+.signin-left button {
+  width: 160px;
+  border-radius: 30px;
+  background-color: rgb(2, 11, 45);
+  margin-top: 10px;
 }
 
-.signin-left button:hover{
-    background-color: rgb(0, 0, 0);
+.signin-left button:hover {
+  background-color: rgb(0, 0, 0);
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(12, 6, 132, 0.7);
+  outline: none;
 }

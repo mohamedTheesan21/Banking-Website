@@ -8,6 +8,7 @@ import SortByDate from "../Models/SortByDate";
 
 function TransferDetails() {
   const [transferDetails, setTransferDetails] = useState(null);
+  const [filteredTransfers, setFilteredTransfers] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -30,6 +31,7 @@ function TransferDetails() {
         if (response.status === 200) {
           const data = await response.json();
           setTransferDetails(data.transferDetails.reverse());
+          setFilteredTransfers(data.transferDetails);
         } else {
           navigate("/account");
         }
@@ -48,14 +50,13 @@ function TransferDetails() {
   };
 
   const handleFilter = () => {
-    const filteredTransfers = transferDetails.filter((transfer) => {
+    setFilteredTransfers(transferDetails.filter((transfer) => {
       const transferDate = new Date(transfer.date);
       const start = startDate ? new Date(startDate) : null;
       const end = endDate ? new Date(endDate) : null;
-  
+      
       return (!start || transferDate >= start) && (!end || transferDate <= end);
-    });
-    setTransferDetails(filteredTransfers);
+    }));
   }
   
 
@@ -72,16 +73,18 @@ function TransferDetails() {
             <SortByDate
               show={modalShow}
               onHide={() => {
+                console.log("onHide");
                 setModalShow(false);
+              }}
+              onApply={() => {
                 handleFilter();
+                setModalShow(false);
               }}
               onChange={(e) => {
-                if (e.target.className === "start-date") {
+                if (e.target.className === "form-control start-date rounded-0") {
                   setStartDate(e.target.value);
-                  console.log("Start",startDate)
                 } else {
                   setEndDate(e.target.value);
-                  console.log("End",endDate)
                 }
               }}
             />
@@ -109,7 +112,7 @@ function TransferDetails() {
                 <th className="align-middle">Balance</th>
               </tr>
             </thead>
-            {transferDetails.map((transfer, index) => {
+            {filteredTransfers.map((transfer, index) => {
               return (
                 <tbody key={index}>
                   <tr>

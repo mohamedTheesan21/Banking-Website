@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { checkToken } from "../Tokens/CheckToken";
+import { checkToken } from "../../Tokens/CheckToken";
+import Loading from "../../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./CSS/Verification.css";
 
-function Verification() {
+function FPVerification() {
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [verificationCode, setVerificationCode] = useState([
     "",
     "",
@@ -19,18 +20,14 @@ function Verification() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      // Decrease remaining time every second
       setRemainingTime((prevTime) => prevTime - 1);
     }, 1000);
 
-    // Clear the timer when remainingTime reaches 0
     if (remainingTime === 0) {
       clearInterval(timer);
-      // Redirect to another page after timeout
-      navigate("/register");
+      navigate("/forgot password");
     }
 
-    // Clear the timer when the component unmounts
     return () => clearInterval(timer);
   }, [remainingTime, navigate]);
 
@@ -54,30 +51,33 @@ function Verification() {
 
   
   useEffect(() => {
-    checkToken("registerToken");
-    const token = localStorage.getItem("registerToken");
+    checkToken("userToken");
+    const token = localStorage.getItem("userToken");
     console.log("Fetching account details", token);
     if (!token) {
-      navigate("/register");
+      navigate("/forgot password");
     }
   },[navigate])
 
   useEffect(() => {
-    const emailVerified = localStorage.getItem("emailVerified");
-    if (emailVerified){
-      navigate("/signup");
+    localStorage.removeItem("userVerified");
+    const userVerified = localStorage.getItem("userVerified");
+    if (userVerified){
+      navigate("/forgot password/reset password");
     }
   })
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const formData = {
-      verificationCode:verificationCode.join(""),
+      verificationCode: verificationCode.join(""),
     };
-    checkToken("registerToken");
-    const token = localStorage.getItem("registerToken");
+    checkToken("userToken");
+    const token = localStorage.getItem("userToken");
+    setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/user/verify", {
+      const response = await fetch("http://localhost:3001/user/FPverify", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -88,14 +88,15 @@ function Verification() {
 
       if (response.status === 200) {
         // set the emailVerified to true
-        localStorage.setItem("emailVerified", true);
-        navigate("/signup");
+        localStorage.setItem("userVerified", true);
+        console.log("User verified");
+        navigate("/forgot password/reset password");
       }
 
       else if (response.status === 403) {
         const data = await response.json();
         console.log(data.message);
-        navigate("/register");
+        navigate("/forgot password/reset password");
       }
 
       else if (response.status === 404) {
@@ -113,7 +114,12 @@ function Verification() {
     } catch (err) {
       console.error("Error submitting form:", err.message);
     }
+    setLoading(false);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="background-full w-100 d-flex flex-column justify-content-center align-items-center">
@@ -163,4 +169,4 @@ function Verification() {
   );
 }
 
-export default Verification;
+export default FPVerification;
