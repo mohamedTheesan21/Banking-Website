@@ -4,7 +4,7 @@ import { checkToken } from "../Tokens/CheckToken";
 import Loading from "../Components/Loading/Loading";
 import { useTransferData } from "../Contexts/TransferDataContext";
 import "bootstrap/dist/css/bootstrap.min.css";
-import TransferSuccess from "../Models/TransferSuccess";
+import SuccessModal from "../Modals/SuccessModal";
 
 function VerifyTransfer() {
   const { transferData } = useTransferData();
@@ -92,7 +92,9 @@ function VerifyTransfer() {
 
   if (modalShow) {
     return (
-      <TransferSuccess
+      <SuccessModal
+        title="Transfer Success"
+        success="Your transfer was successful"
         show={modalShow}
         onHide={() => {
           setModalShow(false);

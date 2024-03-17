@@ -12,13 +12,12 @@ function TransferSuccess(props) {
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
-            Transfer successful
+            {props.title}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* <h3>Transfer successful</h3> */}
           <p>
-            Your transfer was successful. You will receive a confirmation email.
+            {props.success}
           </p>
         </Modal.Body>
         <Modal.Footer>

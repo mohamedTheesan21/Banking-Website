@@ -13,7 +13,7 @@ function Transfer() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const {transferData,setTransferData} = useTransferData();
+  const { transferData, setTransferData } = useTransferData();
 
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ function Transfer() {
     if (!token) {
       navigate("/signin");
     }
-  },[navigate])
+  }, [navigate]);
 
   useEffect(() => {
     if (transferData) {
@@ -37,12 +37,17 @@ function Transfer() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-    const formData = {
-      accountNo: accountNo,
-      amount: amount,
-      description: description,
-    };
+    if (!amount.match(/^\d{3,}\d*\.?\d{0,2}$/)) {
+      setMessage(
+        "Please enter a valid amount in numbers. your amount should have atleast 3 digits before decimal point. eg: 100.00"
+      );
+    } else {
+      const token = localStorage.getItem("token");
+      const formData = {
+        accountNo: accountNo,
+        amount: amount,
+        description: description,
+      };
       try {
         setLoading(true);
         const response = await fetch("http://localhost:3001/account/transfer", {
@@ -57,8 +62,7 @@ function Transfer() {
           const data = await response.json();
           setTransferData(data.transferData);
           navigate("/account/transfer/verify");
-        }
-        else{
+        } else {
           const data = await response.json();
           setMessage(data.message);
         }
@@ -66,58 +70,78 @@ function Transfer() {
         console.error("Error submitting form:", err.message);
       }
       setLoading(false);
+    }
   };
 
-  if(loading){
-    return <Loading />
+  if (loading) {
+    return <Loading />;
   }
 
   return (
     <div>
       <Navbar />
-    <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
-      <div className="box w-50">
-        <form onSubmit={handleSubmit} action="post" className="form-elements transfer w-100">
-          {message && <p className="alert alert-danger">{message}</p>}
-          <div className="d-flex flex-column">
-            <h5 className="mb-0">Account No</h5>
-            <input
-              type="text"
-              className="form-control"
-              onChange={(e) => setAccountNo(e.target.value)}
-              value={accountNo}
-              placeholder="Enter Account No"
-              required
-            />
-          </div>
-          <div className="mt-3 d-flex flex-column">
-            <h5 className="mb-0">Transfer</h5>
-            <input
-              type="text"
-              className="form-control"
-              onChange={(e) => setAmount(e.target.value)}
-              value={amount}
-              placeholder="Enter Amount"
-              required
-            />
-            <input
-              type="text"
-              className="form-control"
-              onChange={(e) => setDescription(e.target.value)}
-              value={description}
-              placeholder="Enter Description"
-              maxLength={16}
-              required
-            />
-          </div>
-          <div>
-            <button type="submit" className="btn btn-success">
-              Transfer
-            </button>
-          </div>
-        </form>
+      <div className="background w-100 d-flex flex-column justify-content-center align-items-center">
+        <div className="box w-50">
+          <form
+            onSubmit={handleSubmit}
+            action="post"
+            className="form-elements transfer w-100"
+          >
+            {message && <p className="alert alert-danger">{message}</p>}
+            <div className="d-flex flex-column">
+              <label htmlFor="accountNo">
+                <strong>Account No:</strong>
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                onChange={(e) => setAccountNo(e.target.value)}
+                value={accountNo}
+                placeholder="Enter Account No"
+                required
+              />
+
+              <label htmlFor="amount">
+                <strong>Amount:</strong>
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                onChange={(e) => {
+                  if (e.target.value.match(/^\d{0,3}\d*\.?\d{0,2}$/)) {
+                    setAmount(e.target.value);
+                  } else {
+                    setMessage(
+                      "Please enter a valid amount in numbers. your amount should have atleast 3 digits before decimal point. eg: 100.00"
+                    );
+                  }
+                }}
+                value={amount}
+                placeholder="Enter Amount"
+                required
+              />
+
+              <label htmlFor="description">
+                <strong>Description:</strong>
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                onChange={(e) => setDescription(e.target.value)}
+                value={description}
+                placeholder="Enter Description"
+                maxLength={16}
+                required
+              />
+            </div>
+            <div>
+              <button type="submit" className="btn btn-success">
+                Transfer
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

@@ -64,10 +64,12 @@ router.post("/verify", verifyToken, async (req, res) => {
   } else {
     const user = await User.findOne({ accountID: req.user.accountID });
     const formData = req.body;
-    if (verifyUser(user.email, formData.verificationCode)) {
+    const isVerified = await verifyUser(user.email, formData.verificationCode);
+
+    if (isVerified) {
       res.status(200).send("User verified");
     } else {
-      res.status(404).json({ message: "Invalid verification code" })
+      res.status(404).json({ message: "Invalid verification code" });
     }
   }
 });
@@ -86,8 +88,8 @@ router.post("/signup", verifyToken, async (req, res) => {
       // Save the new user
       await newUser.save().then(async (user) => {
         console.log("User created successfully.");
-        await existingUser.updateOne({ auth: newUser._id});
-      })
+        await existingUser.updateOne({ auth: newUser._id });
+      });
       passport.authenticate("local")(req, res, () => {
         const token = jwt.sign(
           { username: formData.username },
@@ -124,12 +126,16 @@ router.post("/signin", async (req, res) => {
       passport.authenticate("local", async (err, user) => {
         if (err) {
           console.log(err);
-          return res.status(500).json({ message: "Error during authentication" });
+          return res
+            .status(500)
+            .json({ message: "Error during authentication" });
         }
 
         if (!user) {
           // Invalid username or password
-          return res.status(401).json({ message: "Invalid username or password" });
+          return res
+            .status(401)
+            .json({ message: "Invalid username or password" });
         }
 
         req.login(user, { session: false }, async (err) => {
@@ -151,5 +157,74 @@ router.post("/signin", async (req, res) => {
     }
   });
 });
+
+router.post("/forgot%20password", async (req, res) => {
+  const formData = req.body;
+  const auth = await Auth.findOne({ username: formData.userName });
+  const user = await User.findOne({ auth: auth._id });
+  if (auth) {
+    generateVerificationCodeAndSave(user.email);
+    const token = jwt.sign({ username: formData.userName }, process.env.KEY, {
+      expiresIn: 5 * 60,
+    });
+    return res.status(200).json({ token });
+  } else {
+    return res.status(404).json({ message: "user does not exist" });
+  }
+});
+
+router.post("/FPverify", verifyToken, async (req, res) => {
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
+  } else {
+    const auth = await Auth.findOne({ username: req.user.username });
+    const user = await User.findOne({ auth: auth._id });
+    const formData = req.body;
+    if (user) {
+      const isVerified = await verifyUser(
+        user.email,
+        formData.verificationCode,
+      );
+
+      if (isVerified) {
+        res.status(200).send("User verified");
+      } else {
+        res.status(404).json({ message: "Invalid verification code" });
+      }
+    } else {
+      res.status(404).json({ message: "User does not exist" });
+    }
+  }
+});
+
+router.post(
+  "/forgot%20password/reset%20password",
+  verifyToken,
+  async (req, res) => {
+    if (!req.user) {
+      res.status(403).json({ message: "Invalid token" });
+    } else {
+      
+      try {
+        const auth = await Auth.findOne({ username: req.user.username });
+
+        if (!auth) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        const newPassword = req.body.password;
+
+        await auth.setPassword(newPassword);
+
+        await auth.save();
+      } catch (error) {
+        console.error("Error resetting password:", error);
+        res.status(500).json({ message: "Error resetting password" });
+      }
+
+      res.status(200).json({ message: "Password reset successfully" });
+    }
+  }
+);
 
 module.exports = router;
