@@ -117,7 +117,7 @@ function BeneficiaryInfo() {
         show={modalShow}
         onHide={() => {
           setModalShow(false);
-          navigate("/account");
+          navigate("/account/transfer");
         }}
       />
     );
@@ -197,7 +197,7 @@ function BeneficiaryInfo() {
             <div className="row">
               <div className="col-md-6 d-flex justify-content-center">
                 <a
-                  href="/"
+                  href="/account"
                   className="btn btn-light"
                   style={{ border: "2px solid #000" }}
                 >

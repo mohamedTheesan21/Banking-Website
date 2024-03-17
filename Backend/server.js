@@ -285,6 +285,28 @@ app.post("/account/beneficiary/verify", verifyToken, async (req, res) => {
   }
 });
 
+app.get("/account/beneficiary/details", verifyToken, async (req, res) => {
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
+  } else {
+    const newAuth = await Auth.findOne({ username: req.user.username });
+    const user = await User.findOne({ auth: newAuth._id });
+    try {
+      const beneficiaries = await Beneficiary.find({ userID: user._id });
+      const filteredBeneficiaries = beneficiaries.map((beneficiary) => {
+        return {
+          name: beneficiary.name,
+          accountID: beneficiary.accountID,
+        };
+      });
+      res.status(200).json({ beneficiaries:filteredBeneficiaries });
+    } catch (error) {
+      console.error("Error finding beneficiaries:", error);
+      res.status(500).json({ message: "Error finding beneficiaries" });
+    }
+  }
+})
+
 app.listen(3001, () => {
   console.log("server is running port 3001");
   dbConnect();
