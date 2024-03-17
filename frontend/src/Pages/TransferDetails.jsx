@@ -4,7 +4,7 @@ import { checkToken } from "../Tokens/CheckToken";
 import Loading from "../Components/Loading/Loading";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../Components/Navbar/Navbar";
-import SortByDate from "../Models/SortByDate";
+import SortByDate from "../Modals/SortByDate";
 
 function TransferDetails() {
   const [transferDetails, setTransferDetails] = useState(null);

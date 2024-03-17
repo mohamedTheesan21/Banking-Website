@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Loading from "../../Components/Loading/Loading";
 import { checkToken } from "../../Tokens/CheckToken";
-import ResetPasswordModal from "../../Models/ResetPasswordModal";
+import SuccessModal from "../../Modals/SuccessModal";
 
 function ChangePassword() {
   const [error, setError] = useState("");
@@ -69,12 +69,17 @@ function ChangePassword() {
   }
 
   if (modalShow) {
-    console.log("Theesan")
+    console.log("Theesan");
     return (
-      <ResetPasswordModal show={modalShow} onHide={() => {
-        setModalShow(false);
-        navigate("/signin");
-      }} />
+      <SuccessModal
+        success="Password reset successfully! Please sign in to continue."
+        title="Password Reset"
+        show={modalShow}
+        onHide={() => {
+          setModalShow(false);
+          navigate("/signin");
+        }}
+      />
     );
   }
 

@@ -90,6 +90,11 @@ function FPVerification() {
         // set the emailVerified to true
         localStorage.setItem("userVerified", true);
         console.log("User verified");
+
+        setTimeout(() => {
+          localStorage.removeItem("userVerified");
+        }, 5 * 60 * 1000);
+
         navigate("/forgot password/reset password");
       }
 

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const moment = require("moment");
 
 const transferSchema = new mongoose.Schema({
   sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

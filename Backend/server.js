@@ -14,6 +14,7 @@ const userRouter = require("./Routers/UserRouter");
 const jwt = require("jsonwebtoken");
 const Transfer = require("./models/Transfer");
 const { sendEmail } = require("./verificationEmail");
+const Beneficiary = require("./models/Beneficiary");
 // const cookieParser = require("cookie-parser")
 
 const app = express();
@@ -129,7 +130,6 @@ app.post("/account/transfer/verify", verifyToken, async (req, res) => {
       await receiver.save();
     }
 
-    // Example: Log the transfer
     const transfer = new Transfer({
       sender: sender._id,
       senderBalance: sender.balance,
@@ -220,6 +220,68 @@ app.get("/account/transfer/details", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("Error finding transfer details:", error);
     res.status(500).json({ error: "Error finding transfer details" });
+  }
+});
+
+// Route to handle POST /account/beneficiary
+app.post("/account/beneficiary", verifyToken, async (req, res) => {
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
+  } else {
+    const newAuth = await Auth.findOne({ username: req.user.username });
+    const user = await User.findOne({ auth: newAuth._id });
+    const formData = req.body;
+
+    try {
+      const existingBeneficiary = await Beneficiary.findOne({
+        accountID: formData.accountNo,
+        userID: user._id,
+      });
+      if (existingBeneficiary) {
+        res.status(400).json({ message: "Beneficiary already exists" });
+        return;
+      }
+      const beneficiaryUser = await User.findOne({
+        accountID: formData.accountNo,
+      });
+      if (beneficiaryUser) {
+        res.status(200).json({ name: beneficiaryUser.name });
+      } else {
+        res.status(400).json({ message: "Invalid Account Number" });
+      }
+    } catch (error) {
+      console.error("Error adding beneficiary:", error);
+      res.status(500).json({ message: "Error adding beneficiary try again" });
+    }
+  }
+});
+
+app.post("/account/beneficiary/verify", verifyToken, async (req, res) => {
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
+  } else {
+    const newAuth = await Auth.findOne({ username: req.user.username });
+    const user = await User.findOne({ auth: newAuth._id });
+    try {
+      const beneficiary = new Beneficiary({
+        userID: user._id,
+        name: req.body.name,
+        accountID: req.body.accountNo,
+        email: req.body.email,
+      });
+      await beneficiary.save().then((savedBeneficiary) => {
+        if (savedBeneficiary) {
+          res.status(200).json({ message: "Beneficiary added successfully" });
+        } else {
+          res
+            .status(500)
+            .json({ message: "Error adding beneficiary try again" });
+        }
+      });
+    } catch (error) {
+      console.error("Error adding beneficiary:", error);
+      res.status(500).json({ message: "Error adding beneficiary try again" });
+    }
   }
 });
 
