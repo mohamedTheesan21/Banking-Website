@@ -17,6 +17,7 @@ import ForgotPassword from "./Pages/ForgotPassword/ForgotPassword";
 import FPVerification from "./Pages/ForgotPassword/FPVerification";
 import ChangePassword from "./Pages/ForgotPassword/ChangePassword";
 import BeneficiaryInfo from "./Pages/BeneficiaryInfo";
+import Messaging from "./Pages/Messaging";
 
 function App() {
   return (
@@ -44,6 +45,8 @@ function App() {
         <Route path="/forgot password/reset password" element={<ChangePassword />} />
 
         <Route path="/account/beneficiary" element={<BeneficiaryInfo />} />
+
+        <Route path="/messaging" element={<Messaging />} />
       </Routes>
     </BrowserRouter>
   );

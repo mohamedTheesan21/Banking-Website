@@ -15,7 +15,6 @@ function Transfer() {
   const [loading, setLoading] = useState(false);
   const [transfer, setTransfer] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
-  const [beneficiaryName, setBeneficiaryName] = useState("");
 
   const [modalShow, setModalShow] = useState(false);
 

@@ -15,6 +15,9 @@ const jwt = require("jsonwebtoken");
 const Transfer = require("./models/Transfer");
 const { sendEmail } = require("./verificationEmail");
 const Beneficiary = require("./models/Beneficiary");
+const http = require("http");
+const socketIo = require("socket.io");
+const Message = require("./models/Message");
 // const cookieParser = require("cookie-parser")
 
 const app = express();
@@ -238,7 +241,7 @@ app.post("/account/beneficiary", verifyToken, async (req, res) => {
         userID: user._id,
       });
       if (existingBeneficiary) {
-        res.status(400).json({ message: "Beneficiary already exists" });
+        res.status(400).json({ message: "Beneficiary already exist" });
         return;
       }
       const beneficiaryUser = await User.findOne({
@@ -299,15 +302,78 @@ app.get("/account/beneficiary/details", verifyToken, async (req, res) => {
           accountID: beneficiary.accountID,
         };
       });
-      res.status(200).json({ beneficiaries:filteredBeneficiaries });
+      res.status(200).json({ beneficiaries: filteredBeneficiaries });
     } catch (error) {
       console.error("Error finding beneficiaries:", error);
       res.status(500).json({ message: "Error finding beneficiaries" });
     }
   }
-})
+});
 
-app.listen(3001, () => {
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on("connection", (socket) => {
+  // Extract token from query parameters
+  const token = socket.handshake.query.token;
+
+  try {
+    const decoded = jwt.verify(token.split(" ")[1], process.env.KEY);
+    console.log("User connected:", decoded.username);
+
+    // Listen for new messages
+    socket.on("newMessage", async (message) => {
+      try {
+        const newMessage = new Message({
+          username: decoded.username,
+          sender: "user",
+          content: message.content,
+        });
+        await newMessage.save();
+
+        // Broadcast the new message to all clients
+        io.emit("newMessage", newMessage);
+      } catch (error) {
+        console.error("Error saving message:", error);
+      }
+    });
+
+    // Disconnect event
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
+    });
+  } catch (error) {
+    // If token is invalid, close the socket connection
+    console.error("Invalid token:", error);
+    socket.disconnect(true);
+  }
+});
+
+app.get("/messages", verifyToken, async (req, res) => {
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
+  }
+  await Message.find({ username: req.user.username }).then(async (messages) => {
+    if (messages.length < 4) {
+      const contents = [
+        `Welcome to the customer service chat, ${req.user.username}`,
+        "This is not a AI chat, you will be connected to a real person soon.",
+        "If you have any questions, feel free to ask.",
+        "We will try to respond as soon as possible.",
+      ];
+
+      const newMessage = new Message({
+        username: req.user.username,
+        sender: "admin",
+        content: contents[messages.length],
+      });
+      await newMessage.save();
+    }
+    res.status(200).json({ messages });
+  });
+});
+
+server.listen(3001, () => {
   console.log("server is running port 3001");
   dbConnect();
 });

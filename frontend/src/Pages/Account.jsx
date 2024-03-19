@@ -111,8 +111,10 @@ function Account() {
           <button className="btn btn-danger mt-5" onClick={handleClick}>
             Logout
           </button>
+          <a href="/messaging"><i class="fa-brands fa-rocketchat fa-beat-fade fa-2x" style={{color:"white"}}></i></a>
         </div>
       </div>
+      
     </div>
   );
 }
