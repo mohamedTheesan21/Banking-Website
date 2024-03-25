@@ -10,6 +10,7 @@ import PieChart from "../Components/PieChart";
 function Account() {
   const [user, setUser] = useState(null);
   const [transferDetails, setTransferDetails] = useState(null);
+  const [count, setCount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -48,6 +49,26 @@ function Account() {
           navigate("/account");
         }
       });
+      fetch("http://localhost:3001/messages", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(async (response) => {
+          if (response.status === 200) {
+            const data = await response.json();
+            setCount(data.unreadMessages.length);
+            console.log(data.unreadMessages.length);
+          } else if (response.status === 403) {
+            const data = await response.json();
+            console.log(data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     } else {
       navigate("/signin");
     }
@@ -63,25 +84,23 @@ function Account() {
     return <Loading />;
   }
 
-  const balance = user.balance || 0;
-
   let totalSent = 0;
   let totalReceived = 0;
-  if(transferDetails){
+  if (transferDetails) {
     transferDetails.map((transfer) => {
-      if(transfer.userRole === "sender"){
+      if (transfer.userRole === "sender") {
         totalSent += transfer.amount;
-      }else {
+      } else {
         totalReceived += transfer.amount;
       }
-    })
+    });
   }
 
   const data = [
     ["Role", "Amount"],
     ["Sent", totalSent],
     ["Received", totalReceived],
-  ]
+  ];
 
   return (
     <div>
@@ -111,10 +130,17 @@ function Account() {
           <button className="btn btn-danger mt-5" onClick={handleClick}>
             Logout
           </button>
-          <a href="/messaging"><i class="fa-brands fa-rocketchat fa-beat-fade fa-2x" style={{color:"white"}}></i></a>
+          <div className="w-100">
+            <a href="/messaging" className=" text-decoration-none ">
+              <i
+                className="fa-brands fa-rocketchat fa-beat-fade fa-2x position-absolute"
+                style={{ color: "white" }}
+              ></i>
+              {count > 0 ? <div className="unread-count">{count}</div> : <></>}
+            </a>
+          </div>
         </div>
       </div>
-      
     </div>
   );
 }

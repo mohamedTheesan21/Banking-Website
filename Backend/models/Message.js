@@ -4,6 +4,7 @@ const messageSchema = new mongoose.Schema({
   username: String,
   sender: String,
   content: String,
+  unread: String,
   date: {
     type: String,
     default: () => new Date().toISOString().split("T")[0], // Function returning default value

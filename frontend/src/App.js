@@ -18,6 +18,7 @@ import FPVerification from "./Pages/ForgotPassword/FPVerification";
 import ChangePassword from "./Pages/ForgotPassword/ChangePassword";
 import BeneficiaryInfo from "./Pages/BeneficiaryInfo";
 import Messaging from "./Pages/Messaging";
+import ServiceChat from "./Pages/Admin/ServiceChat";
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
         <Route path="/account/beneficiary" element={<BeneficiaryInfo />} />
 
         <Route path="/messaging" element={<Messaging />} />
+
+        <Route path="/Chat" element={<ServiceChat />} />
       </Routes>
     </BrowserRouter>
   );

@@ -328,8 +328,18 @@ io.on("connection", (socket) => {
           username: decoded.username,
           sender: "user",
           content: message.content,
+          unread: "admin",
         });
         await newMessage.save();
+
+        const messages = await Message.find({
+          username: decoded.username,
+          sender: "admin",
+        });
+        messages.forEach(async (message) => {
+          message.unread = "";
+          await message.save();
+        });
 
         // Broadcast the new message to all clients
         io.emit("newMessage", newMessage);
@@ -366,10 +376,74 @@ app.get("/messages", verifyToken, async (req, res) => {
         username: req.user.username,
         sender: "admin",
         content: contents[messages.length],
+        unread: "",
       });
       await newMessage.save();
     }
-    res.status(200).json({ messages });
+
+    const unreadMessages = messages.filter(
+      (message) => message.unread === "user"
+    );
+    const readMessages = messages.filter(
+      (message) => message.unread === "" || message.unread === "admin"
+    );
+    res.status(200).json({ unreadMessages, readMessages });
+  });
+  const messages = await Message.find({
+    username: req.user.username,
+    sender: "admin",
+  });
+  messages.forEach(async (message) => {
+    message.unread = "";
+    await message.save();
+  });
+});
+
+app.post("/admin/messages", async (req, res) => {
+  res.status(200);
+  await Message.find({ username: req.body.username }).then(async (messages) => {
+    const unreadMessages = messages.filter(
+      (message) => message.unread === "admin"
+    );
+    const readMessages = messages.filter(
+      (message) => message.unread === "" || message.unread === "user"
+    );
+    res.status(200).json({ unreadMessages, readMessages });
+  });
+  const messages = await Message.find({
+    username: req.body.username,
+    sender: "user",
+  });
+  messages.forEach(async (message) => {
+    message.unread = "";
+    await message.save();
+  });
+});
+
+app.post("/admin/sendmessage", async (req, res) => {
+  const newMessage = new Message({
+    username: req.body.username,
+    sender: "admin",
+    content: req.body.content,
+    unread: "user",
+  });
+  await newMessage.save();
+  await Message.find({ username: req.body.username }).then(async (messages) => {
+    const unreadMessages = messages.filter(
+      (message) => message.unread === "admin"
+    );
+    const readMessages = messages.filter(
+      (message) => message.unread === "" || message.unread === "user"
+    );
+    res.status(200).json({ unreadMessages, readMessages });
+  });
+  const messages = await Message.find({
+    username: req.body.username,
+    sender: "user",
+  });
+  messages.forEach(async (message) => {
+    message.unread = "";
+    await message.save();
   });
 });
 

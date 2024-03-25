@@ -27,3 +27,20 @@
     border-radius: 0;
     width: 100px;
 }
+
+.unread-count{
+    position: relative; /* Positioning relative to its normal position in the document flow */
+    bottom: -20px; /* Move the element 10px up */
+    left: 51vw; /* Move the element 10px to the left */
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+    display: flex;
+    justify-content: center; /* Horizontally center the content within the element */
+    align-items: center; /* Vertically center the content within the element */
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1;
+}

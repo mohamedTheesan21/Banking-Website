@@ -5,7 +5,7 @@
 .messages {
   display: flex;
   flex-direction: column;
-  height: 91vh;
+  height: 81vh;
   background-color: #373838;
   margin: 0;
 }
