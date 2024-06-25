@@ -143,6 +143,24 @@ app.post("/account/transfer/verify", verifyToken, async (req, res) => {
     });
     await transfer.save();
 
+    // Service charge for the transfer
+    sender.balance -= 5;
+    await sender.save();
+
+    const profit = await User.findOne({ name: "Management Account" }).session(session);
+
+    profit.balance += 5;
+    await profit.save();
+
+    const SCTransfer = new Transfer({
+      sender: sender._id,
+      senderBalance: sender.balance,
+      receiver: profit._id,
+      amount: 5,
+      description: "Service Charge",
+    });
+    await SCTransfer.save();
+
     // Commit the transaction
     await session.commitTransaction();
     session.endSession();

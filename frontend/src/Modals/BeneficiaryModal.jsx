@@ -6,7 +6,7 @@ function BeneficiaryModal(props) {
     <div className="background-full">
       <Modal
         {...props}
-        size="lg"
+        size="md"
         aria-labelledby="contained-modal-title-vcenter"
         centered
         onHide={null} // Disable closing the modal when clicking outside or pressing the escape key

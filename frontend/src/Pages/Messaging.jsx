@@ -106,6 +106,11 @@ function Messaging() {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown= {(e) => {
+            if (e.key === "Enter") {
+              handleSendMessage();
+            }}
+          }
           placeholder="Type your message here..."
         />
         {newMessage ? (
