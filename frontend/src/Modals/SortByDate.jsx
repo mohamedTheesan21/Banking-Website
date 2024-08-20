@@ -12,7 +12,7 @@ function TransferSuccess(props) {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">Sort</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Filter</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form>
@@ -25,7 +25,7 @@ function TransferSuccess(props) {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button className="rounded-0" onClick={props.onApply}>Sort</Button>
+        <Button className="rounded-0" onClick={props.onApply}>Filter</Button>
       </Modal.Footer>
     </Modal>
   );
