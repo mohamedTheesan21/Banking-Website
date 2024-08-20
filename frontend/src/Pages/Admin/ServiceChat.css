@@ -1,0 +1,73 @@
+.chat-left{
+    padding: 0;
+    height: 100vh;
+    border: 1px solid #262727;
+    background-color: #373838;
+}
+
+.chat-left h1{
+    color: white;
+}
+
+.user{
+    width: 100%;
+    height: 12vh;
+    display: flex;
+    align-items:center ;
+    flex-direction: row;
+    background-color: #373838;
+    border-radius: 10px;
+}
+
+.user:hover{
+    background-color: #646565;
+}
+
+.user h3{
+    display: flex;
+    align-items: center;
+    color: white;
+    height: 50px;
+    margin-left: 20px;
+}
+
+.fa-user {
+  width: 50px; 
+  height: 50px;
+  background-color: #989797;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-right{
+    height: 100vh;
+    /* border: 1px solid #262727; */
+    background-color: #434444;
+    margin: 0;
+    padding: 0;
+}
+
+.chat{
+    height: 91vh;
+}
+
+.header:hover{
+    background-color: #373838;
+}
+
+.unread-count-admin{
+    position: relative;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}

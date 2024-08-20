@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../Components/Loading/Loading";
+import { checkToken } from "../Tokens/CheckToken";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/SignUp.css";
 
@@ -14,6 +15,14 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    checkToken("registerToken");
+    const token = localStorage.getItem("registerToken");
+    if (!token) {
+      navigate("/register");
+    }
+  },[navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault();

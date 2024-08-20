@@ -1,7 +1,7 @@
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 
-function TransferSuccess(props) {
+function BeneficiaryModal(props) {
   return (
     <div className="background-full">
       <Modal
@@ -18,16 +18,22 @@ function TransferSuccess(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ borderTop: "none" }}>
-          <p>
-            {props.success}
-          </p>
+          <Modal.Body style={{ borderTop: "none" }}>
+            <p style={{color:"blue"}}>
+              <strong>Name:</strong> {props.name}
+              <br />
+              <strong>Beneficiary Account Number:</strong> {props.accountid}
+            </p>
+          </Modal.Body>
         </Modal.Body>
         <Modal.Footer style={{ borderTop: "none" }}>
-          <Button onClick={props.onHide} style={{ borderRadius: 0 }}>Close</Button>
+          <Button onClick={props.onHide} style={{ borderRadius: 0 }}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
   );
 }
 
-export default TransferSuccess;
+export default BeneficiaryModal;

@@ -15,6 +15,9 @@ const jwt = require("jsonwebtoken");
 const Transfer = require("./models/Transfer");
 const { sendEmail } = require("./verificationEmail");
 const Beneficiary = require("./models/Beneficiary");
+const http = require("http");
+const socketIo = require("socket.io");
+const Message = require("./models/Message");
 // const cookieParser = require("cookie-parser")
 
 const app = express();
@@ -140,6 +143,24 @@ app.post("/account/transfer/verify", verifyToken, async (req, res) => {
     });
     await transfer.save();
 
+    // Service charge for the transfer
+    sender.balance -= 5;
+    await sender.save();
+
+    const profit = await User.findOne({ name: "Management Account" }).session(session);
+
+    profit.balance += 5;
+    await profit.save();
+
+    const SCTransfer = new Transfer({
+      sender: sender._id,
+      senderBalance: sender.balance,
+      receiver: profit._id,
+      amount: 5,
+      description: "Service Charge",
+    });
+    await SCTransfer.save();
+
     // Commit the transaction
     await session.commitTransaction();
     session.endSession();
@@ -238,7 +259,7 @@ app.post("/account/beneficiary", verifyToken, async (req, res) => {
         userID: user._id,
       });
       if (existingBeneficiary) {
-        res.status(400).json({ message: "Beneficiary already exists" });
+        res.status(400).json({ message: "Beneficiary already exist" });
         return;
       }
       const beneficiaryUser = await User.findOne({
@@ -285,7 +306,166 @@ app.post("/account/beneficiary/verify", verifyToken, async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
+app.get("/account/beneficiary/details", verifyToken, async (req, res) => {
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
+  } else {
+    const newAuth = await Auth.findOne({ username: req.user.username });
+    const user = await User.findOne({ auth: newAuth._id });
+    try {
+      const beneficiaries = await Beneficiary.find({ userID: user._id });
+      const filteredBeneficiaries = beneficiaries.map((beneficiary) => {
+        return {
+          name: beneficiary.name,
+          accountID: beneficiary.accountID,
+        };
+      });
+      res.status(200).json({ beneficiaries: filteredBeneficiaries });
+    } catch (error) {
+      console.error("Error finding beneficiaries:", error);
+      res.status(500).json({ message: "Error finding beneficiaries" });
+    }
+  }
+});
+
+const server = http.createServer(app);
+const io = socketIo(server);
+
+io.on("connection", (socket) => {
+  // Extract token from query parameters
+  const token = socket.handshake.query.token;
+
+  try {
+    const decoded = jwt.verify(token.split(" ")[1], process.env.KEY);
+    console.log("User connected:", decoded.username);
+
+    // Listen for new messages
+    socket.on("newMessage", async (message) => {
+      try {
+        const newMessage = new Message({
+          username: decoded.username,
+          sender: "user",
+          content: message.content,
+          unread: "admin",
+        });
+        await newMessage.save();
+
+        const messages = await Message.find({
+          username: decoded.username,
+          sender: "admin",
+        });
+        messages.forEach(async (message) => {
+          message.unread = "";
+          await message.save();
+        });
+
+        // Broadcast the new message to all clients
+        io.emit("newMessage", newMessage);
+      } catch (error) {
+        console.error("Error saving message:", error);
+      }
+    });
+
+    // Disconnect event
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
+    });
+  } catch (error) {
+    // If token is invalid, close the socket connection
+    console.error("Invalid token:", error);
+    socket.disconnect(true);
+  }
+});
+
+app.get("/messages", verifyToken, async (req, res) => {
+  if (!req.user) {
+    res.status(403).json({ message: "Invalid token" });
+  }
+  await Message.find({ username: req.user.username }).then(async (messages) => {
+    if (messages.length < 4) {
+      const contents = [
+        `Welcome to the customer service chat, ${req.user.username}`,
+        "This is not a AI chat, you will be connected to a real person soon.",
+        "If you have any questions, feel free to ask.",
+        "We will try to respond as soon as possible.",
+      ];
+
+      const newMessage = new Message({
+        username: req.user.username,
+        sender: "admin",
+        content: contents[messages.length],
+        unread: "",
+      });
+      await newMessage.save();
+    }
+
+    const unreadMessages = messages.filter(
+      (message) => message.unread === "user"
+    );
+    const readMessages = messages.filter(
+      (message) => message.unread === "" || message.unread === "admin"
+    );
+    res.status(200).json({ unreadMessages, readMessages });
+  });
+  const messages = await Message.find({
+    username: req.user.username,
+    sender: "admin",
+  });
+  messages.forEach(async (message) => {
+    message.unread = "";
+    await message.save();
+  });
+});
+
+app.post("/admin/messages", async (req, res) => {
+  res.status(200);
+  await Message.find({ username: req.body.username }).then(async (messages) => {
+    const unreadMessages = messages.filter(
+      (message) => message.unread === "admin"
+    );
+    const readMessages = messages.filter(
+      (message) => message.unread === "" || message.unread === "user"
+    );
+    res.status(200).json({ unreadMessages, readMessages });
+  });
+  const messages = await Message.find({
+    username: req.body.username,
+    sender: "user",
+  });
+  messages.forEach(async (message) => {
+    message.unread = "";
+    await message.save();
+  });
+});
+
+app.post("/admin/sendmessage", async (req, res) => {
+  const newMessage = new Message({
+    username: req.body.username,
+    sender: "admin",
+    content: req.body.content,
+    unread: "user",
+  });
+  await newMessage.save();
+  await Message.find({ username: req.body.username }).then(async (messages) => {
+    const unreadMessages = messages.filter(
+      (message) => message.unread === "admin"
+    );
+    const readMessages = messages.filter(
+      (message) => message.unread === "" || message.unread === "user"
+    );
+    res.status(200).json({ unreadMessages, readMessages });
+  });
+  const messages = await Message.find({
+    username: req.body.username,
+    sender: "user",
+  });
+  messages.forEach(async (message) => {
+    message.unread = "";
+    await message.save();
+  });
+});
+
+server.listen(3001, () => {
   console.log("server is running port 3001");
   dbConnect();
 });
